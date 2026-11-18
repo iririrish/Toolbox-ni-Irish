@@ -93,6 +93,11 @@ textarea{min-height:140px;resize:vertical}
 .strip{display:flex;flex-direction:column;align-items:center;gap:10px;max-height:440px;overflow-y:auto;overflow-x:hidden;padding-right:4px}
 figure{margin:0;flex:none;width:100%;max-width:380px;text-align:center;border:2px solid var(--c,var(--line));border-radius:8px;padding:4px;background:var(--card)}
 figure canvas{display:block;width:100%;height:auto;border-radius:4px}figcaption{font-size:11px;color:var(--mute);margin-top:2px}
+.fi{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:10px;padding:6px 8px}
+.th{width:44px;height:56px;flex:none;border-radius:6px;overflow:hidden;background:var(--bg);display:grid;place-items:center;font-size:10px;color:var(--mute)}
+.th img,.th canvas{max-width:100%;max-height:100%;object-fit:contain}
+.fm{flex:1;min-width:0;display:flex;flex-direction:column}.fm b{font-size:13px;font-weight:500;color:var(--ink);overflow-wrap:anywhere}.fm small{font-size:12px;color:var(--mute)}
+.fi .btn{padding:2px 9px;font-size:14px}
 .err{color:#d9364f;font-size:14px}
 .row{display:flex;gap:8px;flex-wrap:wrap}
 .cnt{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center}
@@ -176,6 +181,15 @@ const ANY='image/*,application/pdf',CDN='https://cdnjs.cloudflare.com/ajax/libs/
 const lib=src=>new Promise((ok,no)=>{if(lib.c[src])return ok();const e=document.createElement('script');e.src=src;e.onload=()=>{lib.c[src]=1;ok()};e.onerror=()=>no(new Error('Could not load a library. Check your internet connection.'));document.head.appendChild(e)});lib.c={};
 async function pdfjs(f){await lib(CDN+'pdf.js/3.11.174/pdf.min.js');pdfjsLib.GlobalWorkerOptions.workerSrc=CDN+'pdf.js/3.11.174/pdf.worker.min.js';return pdfjsLib.getDocument({data:await f.arrayBuffer()}).promise}
 async function renderPg(pdf,n,sc){const pg=await pdf.getPage(n),vp=pg.getViewport({scale:sc}),c=cv(Math.floor(vp.width),Math.floor(vp.height)),x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);await pg.render({canvasContext:x,viewport:vp}).promise;return c}
+const GIFENC='https://cdn.jsdelivr.net/npm/gifenc@1.0.3/+esm',GIFUCT='https://cdn.jsdelivr.net/npm/gifuct-js@2.1.2/+esm',IMGLY='https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/+esm';
+const esm=async u=>{const m=await import(u);return m.default&&typeof m.default==='object'?{...m.default,...m}:m};
+const tick=()=>new Promise(r=>setTimeout(r));
+function keyOut(d,w,h,bg,th){const n=w*h,seen=new Uint8Array(n),st=new Int32Array(n);let sp=0;
+ const match=i=>{const k=i*4;if(d[k+3]===0)return true;const r=d[k]-bg[0],g=d[k+1]-bg[1],b=d[k+2]-bg[2];return r*r+g*g+b*b<=th*th};
+ const push=i=>{if(!seen[i]&&match(i)){seen[i]=1;st[sp++]=i}};
+ for(let x=0;x<w;x++){push(x);push((h-1)*w+x)}for(let y=0;y<h;y++){push(y*w);push(y*w+w-1)}
+ while(sp){const i=st[--sp],x=i%w;if(x>0)push(i-1);if(x<w-1)push(i+1);if(i>=w)push(i-w);if(i<n-w)push(i+w)}
+ for(let i=0;i<n;i++)if(seen[i]){const k=i*4;d[k]=d[k+1]=d[k+2]=d[k+3]=0}}
 const TOOLS=[
 {id:'compress',n:'Image Compressor',e:'🗜️',c:'Image',d:'Reduce image file size.',a:IMG,m:1,
  opts:[{k:'fmt',l:'Format',t:'select',o:['jpg','webp'],v:'jpg'},{k:'q',l:'Quality',t:'range',min:.1,max:1,step:.05,v:.7}],
@@ -230,6 +244,32 @@ const TOOLS=[
    if(f.type===PDF){const pdf=await pdfjs(f);for(let n=1;n<=pdf.numPages;n++){p(`File ${i+1}/${fs.length}, page ${n}/${pdf.numPages}…`);t+=(await w.recognize(await renderPg(pdf,n,2))).data.text+'\n\n'}}
    else{p(`File ${i+1}/${fs.length}…`);t=(await w.recognize(f)).data.text}
    out.push({name:base(f.name)+'.txt',blob:new Blob([t],{type:'text/plain'}),note:t.trim()?t.length+' characters':'no text found'})}}finally{await w.terminate()}return out}},
+{id:'gifmaker',n:'GIF Maker',e:'🎞️',c:'Image',d:'Turn images into an animated GIF.',a:IMG,m:1,min:2,hint:'Add 2 or more images and set the order with ↑ ↓. Every frame is fitted to the size of the first image.',
+ opts:[{k:'d',l:'Frame delay (ms)',t:'number',v:'500'},{k:'w',l:'Width (px)',t:'number',v:'480'},{k:'loop',l:'Loop',t:'select',o:['forever','once'],v:'forever'}],
+ run:async(fs,o,p)=>{p('Loading GIF encoder…');const E=await esm(GIFENC),g=E.GIFEncoder(),first=await loadImg(fs[0]),W=Math.max(16,Math.min(1000,Math.round(+o.w)||480)),H=Math.max(1,Math.round(first.naturalHeight*W/first.naturalWidth));
+  for(let i=0;i<fs.length;i++){p(`Frame ${i+1}/${fs.length}…`);await tick();const im=i?await loadImg(fs[i]):first,c=cv(W,H),x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,W,H);
+   const k=Math.min(W/im.naturalWidth,H/im.naturalHeight),w=im.naturalWidth*k,h=im.naturalHeight*k;x.drawImage(im,(W-w)/2,(H-h)/2,w,h);
+   const d=x.getImageData(0,0,W,H).data,pal=E.quantize(d,256);g.writeFrame(E.applyPalette(d,pal),W,H,{palette:pal,delay:Math.max(20,+o.d||500),repeat:o.loop==='once'?-1:0})}
+  g.finish();const b=new Blob([g.bytes()],{type:'image/gif'});return[{name:'animation.gif',blob:b,note:fs.length+' frames · '+mb(b.size)}]}},
+{id:'gifbg',n:'GIF Remove Background',e:'🪄',c:'Image',d:'Make a GIF background transparent.',a:'image/gif',m:0,hint:'Solid color is fast and works best on plain backgrounds. AI works on any background but is slow, so keep the GIF short (up to 80 frames).',
+ opts:[{k:'mode',l:'Method',t:'select',o:['solid color','AI (slow)'],v:'solid color'},{k:'bg',l:'Background color',t:'select',o:['auto','white','black','green','custom'],v:'auto'},{k:'cc',l:'Custom color',t:'color',v:'#00ff00'},{k:'tol',l:'Tolerance (%)',t:'range',min:2,max:60,step:1,v:15}],
+ run:async(fs,o,p)=>{p('Reading GIF…');await tick();const [G,E]=await Promise.all([esm(GIFUCT),esm(GIFENC)]),par=G.parseGIF(await fs[0].arrayBuffer()),fr=G.decompressFrames(par,true),W=par.lsd.width,H=par.lsd.height,ai=o.mode.startsWith('AI');
+  if(!fr.length)throw new Error('No frames found in this GIF.');
+  if(ai&&fr.length>80)throw new Error('AI mode supports up to 80 frames and this GIF has '+fr.length+'. Use the solid color method or a shorter GIF.');
+  const c=cv(W,H),x=c.getContext('2d',{willReadFrequently:true}),t2=cv(1,1),tx=t2.getContext('2d'),frames=[];
+  for(const f of fr){const{left,top,width,height}=f.dims;const snap=f.disposalType===3?x.getImageData(0,0,W,H):null;t2.width=width;t2.height=height;tx.putImageData(new ImageData(f.patch,width,height),0,0);x.drawImage(t2,left,top);frames.push({img:x.getImageData(0,0,W,H),delay:f.delay});
+   if(f.disposalType===2)x.clearRect(left,top,width,height);else if(snap)x.putImageData(snap,0,0)}
+  let bg,th=(+o.tol/100)*441,mod;
+  if(ai){p('Loading AI model…');mod=await esm(IMGLY)}else{const h=o.bg,d0=frames[0].img.data;bg=h==='auto'?[d0[0],d0[1],d0[2]]:h==='white'?[255,255,255]:h==='black'?[0,0,0]:h==='green'?[0,255,0]:[1,3,5].map(i=>parseInt(o.cc.slice(i,i+2),16))}
+  const g=E.GIFEncoder();
+  for(let i=0;i<frames.length;i++){const lb=`Frame ${i+1}/${frames.length}…`;p(lb);await tick();let d=frames[i].img.data;
+   if(ai){const cc=cv(W,H),cx=cc.getContext('2d',{willReadFrequently:true});cx.putImageData(frames[i].img,0,0);const res=await mod.removeBackground(await toBlob(cc,'image/png'),{output:{format:'image/png'},progress:(k,a,b)=>{p(String(k).startsWith('fetch')&&b?`Downloading model ${Math.round(a/b*100)}%`:lb)}});
+    const ri=await loadImg(res);cx.clearRect(0,0,W,H);cx.drawImage(ri,0,0,W,H);d=cx.getImageData(0,0,W,H).data;for(let k=0;k<d.length;k+=4){if(d[k+3]<128){d[k]=d[k+1]=d[k+2]=d[k+3]=0}else d[k+3]=255}}
+   else keyOut(d,W,H,bg,th);
+   const pal=E.quantize(d,255,{format:'rgb565'}),idx=E.applyPalette(d,pal,'rgb565');pal.push([0,0,0]);const ti=pal.length-1;let any=false;
+   for(let k=0;k<idx.length;k++)if(d[k*4+3]===0){idx[k]=ti;any=true}
+   g.writeFrame(idx,W,H,{palette:pal,delay:Math.max(20,frames[i].delay||100),transparent:any,transparentIndex:ti,dispose:2,repeat:0})}
+  g.finish();const b=new Blob([g.bytes()],{type:'image/gif'});return[{name:base(fs[0].name)+'-no-bg.gif',blob:b,note:frames.length+' frames · '+mb(b.size)}]}},
 {id:'wordcount',n:'Word Counter',e:'🔢',c:'Text',d:'Count words, characters, sentences.',text:1},
 {id:'case',n:'Case Converter',e:'🔤',c:'Text',d:'UPPER, lower, Title, Sentence.',text:2}
 ];
@@ -259,7 +299,7 @@ $('#n-tools').textContent=TOOLS.filter(t=>!t.soon).length;
 $('#q').oninput=render;
 
 /* hero converter */
-[['→ JPG','convert','jpg'],['→ PNG','convert','png'],['→ WEBP','convert','webp'],['Image → PDF','img2pdf'],['Compress','compress'],['Resize','resize'],['Remove background','bgremove'],['PDF → JPG','pdf2jpg'],['OCR','ocr'],['Merge PDF','pdfmerge'],['Split PDF','pdfsplit']].forEach(([l,id,v])=>{const b=document.createElement('button');b.className='chip';b.textContent=l;b.onclick=()=>openTool(id,null,v);$('#chips').appendChild(b)});
+[['→ JPG','convert','jpg'],['→ PNG','convert','png'],['→ WEBP','convert','webp'],['Image → PDF','img2pdf'],['Compress','compress'],['Resize','resize'],['GIF Maker','gifmaker'],['Remove background','bgremove'],['PDF → JPG','pdf2jpg'],['OCR','ocr'],['Merge PDF','pdfmerge'],['Split PDF','pdfsplit']].forEach(([l,id,v])=>{const b=document.createElement('button');b.className='chip';b.textContent=l;b.onclick=()=>openTool(id,null,v);$('#chips').appendChild(b)});
 const hp=document.createElement('input');hp.type='file';hp.multiple=true;hp.accept='image/*,application/pdf';
 function route(fs){fs=[...fs];if(!fs.length)return;const pdfs=fs.filter(f=>f.type===PDF),imgs=fs.filter(f=>f.type.startsWith('image/'));
  if(pdfs.length&&!imgs.length)openTool(pdfs.length>1?'pdfmerge':'pdfsplit',pdfs);else if(imgs.length)openTool('convert',imgs);}
@@ -298,13 +338,14 @@ async function pdfPreview(r,box){
    if(parts.length){let k=0;while(i>cum[k])k++;f.style.setProperty('--c',COL[k%COL.length]);cp.textContent='p'+i+' · file '+(k+1)}else cp.textContent='Page '+i;
    f.append(c,cp);st.appendChild(f)}
  }catch(e){box.textContent='Preview not available (needs internet the first time).'}}
+async function pdfThumb(f,th,sm){try{const pdf=await pdfjs(f),pg=await pdf.getPage(1),c=await renderPg(pdf,1,112*Math.min(devicePixelRatio||1,2)/pg.getViewport({scale:1}).width);th.textContent='';th.appendChild(c);sm.textContent+=' · '+pdf.numPages+' page'+(pdf.numPages>1?'s':'')}catch(e){sm.textContent+=' · no preview'}}
 /* tool dialog */
-const dlg=$('#dlg'),kdlg=$('#kdlg');let cur=null,files=[],urls=[];
+const dlg=$('#dlg'),kdlg=$('#kdlg');let cur=null,files=[],urls=[],pu=[];
 function openTool(id,pre,val){const t=get(id);cur=t;files=pre?[...pre]:[];
  recent=[id,...recent.filter(x=>x!==id)].slice(0,6);ls.set('recent',recent);render();
  $('#d-title').textContent=t.e+' '+t.n;const B=$('#d-body');B.innerHTML='';
  if(t.text){textUI(t,B);dlg.showModal();return}
- const acc=t.a===IMG?'image':t.a===PDF?'PDF':'image or PDF';
+ const acc=t.a===IMG?'image':t.a===PDF?'PDF':t.a==='image/gif'?'GIF':'image or PDF';
  B.innerHTML=`<div class="drop" id="td" tabindex="0" role="button"><h3>Drop ${acc} files here</h3><small>or click to choose${t.m?' (multiple allowed)':''}</small></div><div class="files" id="fl"></div><small style="color:var(--mute)">${t.hint||''}</small><div id="op" style="display:grid;gap:10px"></div><div class="row"><button class="btn p" id="run">Run</button><button class="btn" id="clr">Clear</button></div><div class="res" id="rs"></div><div class="err" id="er"></div>`;
  const op=$('#op'),vals={};
  (t.opts||[]).forEach(o=>{vals[o.k]=(id==='convert'&&o.k==='fmt'&&val)?val:o.v;const w=document.createElement('label');w.className='opt';w.innerHTML=`<span>${o.l}</span>`;let el;
@@ -317,9 +358,18 @@ function openTool(id,pre,val){const t=get(id);cur=t;files=pre?[...pre]:[];
  ['dragover','dragenter'].forEach(ev=>td.addEventListener(ev,e=>{e.preventDefault();td.classList.add('over')}));
  ['dragleave','drop'].forEach(ev=>td.addEventListener(ev,e=>{e.preventDefault();td.classList.remove('over')}));
  td.addEventListener('drop',e=>add(e.dataTransfer.files));
- const ok=f=>(t.a.includes('image')&&f.type.startsWith('image/'))||(t.a.includes('pdf')&&f.type===PDF);
+ const ok=f=>t.a.split(',').some(a=>a.endsWith('/*')?f.type.startsWith(a.slice(0,-1)):f.type===a);
  function add(l){const g=[...l].filter(ok);files=t.m?[...files,...g]:g.slice(0,1);list()}
- function list(){$('#fl').innerHTML=files.map(f=>`<div>• ${f.name.replace(/</g,'&lt;')} (${mb(f.size)})</div>`).join('');$('#rs').innerHTML='';$('#er').textContent=''}
+ function list(){
+  pu.forEach(URL.revokeObjectURL);pu=[];const fl=$('#fl');fl.textContent='';
+  files.forEach((f,i)=>{const row=document.createElement('div'),th=document.createElement('div'),meta=document.createElement('div'),ac=document.createElement('div');
+   row.className='fi';th.className='th';meta.className='fm';ac.className='row';meta.innerHTML='<b></b><small></small>';meta.firstChild.textContent=f.name;meta.lastChild.textContent=mb(f.size);
+   if(f.type.startsWith('image/')){const u=URL.createObjectURL(f);pu.push(u);const im=new Image();im.alt='';im.src=u;th.appendChild(im)}else{th.textContent='PDF';pdfThumb(f,th,meta.lastChild)}
+   const mk=(tx,lb,fn)=>{const x=document.createElement('button');x.className='btn';x.textContent=tx;x.setAttribute('aria-label',lb);x.onclick=fn;ac.appendChild(x)};
+   if(t.m&&files.length>1){if(i>0)mk('↑','Move up',()=>{[files[i-1],files[i]]=[files[i],files[i-1]];list()});if(i<files.length-1)mk('↓','Move down',()=>{[files[i+1],files[i]]=[files[i],files[i+1]];list()})}
+   mk('×','Remove file',()=>{files.splice(i,1);list()});
+   row.append(th,meta,ac);fl.appendChild(row)});
+  $('#rs').innerHTML='';$('#er').textContent=''}
  $('#clr').onclick=()=>{files=[];list()};
  $('#run').onclick=window.runCur=async()=>{const er=$('#er');er.textContent='';$('#rs').innerHTML='';
   if(files.length<(t.min||1)){er.textContent=t.min?`Add at least ${t.min} files.`:'Add a file first.';return}
