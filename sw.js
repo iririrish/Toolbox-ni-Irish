@@ -1,4 +1,4 @@
-const V='toolbox-v1.9';
+const V='toolbox-v1.10';
 const CORE=['./','index.html','manifest.webmanifest','icon-192.png','icon-512.png','apple-touch-icon.png'];
 const C='https://cdnjs.cloudflare.com/ajax/libs/';
 const LIBS=[C+'pdf-lib/1.17.1/pdf-lib.min.js',C+'jspdf/2.5.1/jspdf.umd.min.js',C+'pdf.js/3.11.174/pdf.min.js',C+'pdf.js/3.11.174/pdf.worker.min.js',C+'tesseract.js/5.0.5/tesseract.min.js'];
