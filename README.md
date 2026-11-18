@@ -73,6 +73,13 @@ Offline support saves the page and its libraries in the browser's cache. If you 
 
 ## Changelog
 
+### v1.5 — Vertical previews and custom scrollbar
+- PDF previews now scroll **up and down** instead of sideways, so there is no horizontal slider. Pages stack in one column and the preview box scrolls vertically. This works on phones too.
+- Page thumbnails are larger and sharper (they fill the width of the box).
+- Long file names now wrap, and result buttons wrap onto a new line on small screens, so nothing pushes the page sideways.
+- New scrollbar style across the whole site: thin, rounded, and see-through, with **no up/down arrow buttons**. It has light and dark mode colors and gets a bit darker on hover. Firefox uses its own thin scrollbar.
+- Bumped the offline cache to v1.5 so phones pick up the update.
+
 ### v1.4 — Installable phone app with offline support
 - Made the site a **PWA**: it can be installed on Android and iPhone and opens full screen like an app.
 - Added `manifest.webmanifest`, `sw.js` (service worker), and app icons (`icon-192.png`, `icon-512.png`, `apple-touch-icon.png`).
