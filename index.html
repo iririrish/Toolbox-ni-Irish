@@ -73,6 +73,8 @@ textarea{min-height:140px;resize:vertical}
 .res{display:grid;gap:8px}
 .r{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:13px}
 .r a{color:var(--acc);font-weight:600;text-decoration:none;white-space:nowrap}
+.r.img{flex-direction:column;align-items:stretch}.r .bar{display:flex;justify-content:space-between;align-items:center;gap:10px}.r .btn{padding:4px 10px;font-size:13px}.r .row{align-items:center}
+.pv{max-height:160px;max-width:100%;object-fit:contain;align-self:center;border-radius:8px;background:conic-gradient(#ccc 25%,#fff 0 50%,#ccc 0 75%,#fff 0) 0 0/16px 16px}
 .err{color:#d9364f;font-size:14px}
 .row{display:flex;gap:8px;flex-wrap:wrap}
 .cnt{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center}
@@ -178,7 +180,7 @@ const TOOLS=[
 {id:'pdfrotate',n:'PDF Page Rotator',e:'🔃',c:'PDF',d:'Rotate every page.',a:PDF,m:0,
  opts:[{k:'deg',l:'Rotate',t:'select',o:['90','180','270'],v:'90'}],
  run:async(fs,o)=>{const d=await PDFLib.PDFDocument.load(await fs[0].arrayBuffer());d.getPages().forEach(p=>p.setRotation(PDFLib.degrees((p.getRotation().angle+ +o.deg)%360)));return[{name:base(fs[0].name)+'-rotated.pdf',blob:new Blob([await d.save()],{type:PDF})}]}},
-{id:'bgremove',n:'Background Remover',e:'✨',c:'Image',d:'Cut out the background with AI.',a:IMG,m:1,hint:'The first run downloads an AI model (about 40–80 MB), then it is faster. Needs internet.',
+{id:'bgremove',n:'Background Remover',e:'✨',c:'Image',d:'Cut out the background with AI.',a:IMG,m:1,copy:1,
  opts:[{k:'bg',l:'Background',t:'select',o:['transparent','white'],v:'transparent'}],
  run:async(fs,o,p)=>{p('Loading AI model…');const m=await import('https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/+esm'),out=[];
   for(let i=0;i<fs.length;i++){const lb=`Image ${i+1}/${fs.length}…`;p(lb);let b=await m.removeBackground(fs[i],{output:{format:'image/png'},progress:(k,c,t)=>{p(String(k).startsWith('fetch')&&t?`Downloading model ${Math.round(c/t*100)}%`:lb)}});
@@ -272,7 +274,13 @@ function openTool(id,pre,val){const t=get(id);cur=t;files=pre?[...pre]:[];
   if(files.length<(t.min||1)){er.textContent=t.min?`Add at least ${t.min} files.`:'Add a file first.';return}
   const btn=$('#run');btn.disabled=true;btn.textContent='Working…';
   try{const out=await t.run(files,vals,s=>{btn.textContent=s});urls.forEach(URL.revokeObjectURL);urls=[];
-   $('#rs').innerHTML='';out.forEach(r=>{const u=URL.createObjectURL(r.blob);urls.push(u);const d=document.createElement('div');d.className='r';d.innerHTML=`<span></span><a download>Download</a>`;d.firstChild.textContent=r.name+(r.note?' · '+r.note:'');d.lastChild.href=u;d.lastChild.download=r.name;$('#rs').appendChild(d)})}
+   $('#rs').innerHTML='';out.forEach(r=>{const u=URL.createObjectURL(r.blob),isImg=r.blob.type.startsWith('image/'),d=document.createElement('div');urls.push(u);d.className='r'+(isImg?' img':'');
+    d.innerHTML=(isImg?'<img class="pv" alt="Preview">':'')+'<div class="bar"><span></span><div class="row"></div></div>';
+    if(isImg)d.querySelector('.pv').src=u;
+    d.querySelector('span').textContent=r.name+(r.note?' · '+r.note:'');
+    const act=d.querySelector('.row'),a=document.createElement('a');a.textContent='Download';a.href=u;a.download=r.name;
+    if(isImg&&t.copy){const cb=document.createElement('button');cb.className='btn';cb.textContent='Copy';cb.onclick=async()=>{try{const png=r.blob.type==='image/png'?Promise.resolve(r.blob):loadImg(r.blob).then(i=>encode(i,i.naturalWidth,i.naturalHeight,'image/png'));await navigator.clipboard.write([new ClipboardItem({'image/png':png})]);cb.textContent='Copied!'}catch(e){cb.textContent='Copy failed'}setTimeout(()=>{cb.textContent='Copy'},2000)};act.appendChild(cb)}
+    act.appendChild(a);$('#rs').appendChild(d)})}
   catch(e){er.textContent='Could not process: '+(e.message||'file may be corrupted or password-protected.')}
   btn.disabled=false;btn.textContent='Run'};
  list();dlg.showModal()}
