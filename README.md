@@ -30,7 +30,7 @@ Open the app once while online. After that:
 
 | Works offline | Needs internet the first time, then works offline |
 |---------------|--------------------------------------------------|
-| Image Compressor, Resizer, Converter, Rotator, Image to PDF | Background Remover (downloads an AI model on first use), GIF Maker and GIF Remove Background (load small libraries on first use; the AI method also downloads the model) |
+| Image Compressor, Resizer, Converter, Rotator, Image to PDF | Background Remover (downloads an AI model on first use), GIF Maker, Video to GIF and GIF Remove Background (load small libraries on first use; the AI method also downloads the model) |
 | PDF Merger, Splitter, Page Rotator, PDF Scanner | OCR (downloads engine and language data on first use) |
 | PDF to JPG/PNG, PDF to Text, previews | |
 | Word Counter, Case Converter | |
@@ -43,7 +43,7 @@ Offline support saves the page and its libraries in the browser's cache. If you 
 
 | Category | Tools |
 |----------|-------|
-| Image | Image Compressor, Image Resizer, Image Converter (PNG/JPG/WEBP), Image Rotator and Flipper, Image to PDF, Background Remover, GIF Maker, GIF Remove Background |
+| Image | Image Compressor, Image Resizer, Image Converter (PNG/JPG/WEBP), Image Rotator and Flipper, Image to PDF, Background Remover, GIF Maker, GIF Remove Background, Video to GIF |
 | PDF | PDF Merger, PDF Splitter / Page Extractor, PDF Page Rotator, PDF to JPG/PNG, PDF to Text, PDF Scanner |
 | Text | Word Counter, Case Converter, OCR (image or scanned PDF to text) |
 
@@ -69,10 +69,18 @@ Offline support saves the page and its libraries in the browser's cache. If you 
 - Loaded only when a tool needs them: [pdf.js](https://mozilla.github.io/pdf.js/) (PDF to JPG/PNG, PDF to Text, OCR on PDFs) and [Tesseract.js](https://tesseract.projectnaptha.com/) (OCR).
 - Background Remover uses [@imgly/background-removal](https://github.com/imgly/background-removal-js), loaded from jsDelivr. Its AI model (about 40–80 MB) downloads on first use, then the browser caches it. Images are still processed on your device.
 - OCR downloads language data on first use. These tools need an internet connection the first time.
-- GIF Maker uses [gifenc](https://github.com/mattdesl/gifenc) to build GIFs. GIF Remove Background uses [gifuct-js](https://github.com/matt-way/gifuct-js) to read GIF frames, then gifenc to save them. Both load from jsDelivr when first used.
+- GIF Maker and Video to GIF use [gifenc](https://github.com/mattdesl/gifenc) to build GIFs. Video to GIF reads frames with the browser's built-in video player, so it supports the formats your browser can play (usually MP4 and WebM). GIF Remove Background uses [gifuct-js](https://github.com/matt-way/gifuct-js) to read GIF frames, then gifenc to save them. Both load from jsDelivr when first used.
 - Favorites, recent tools, and theme are saved in the browser's `localStorage`.
 
 ## Changelog
+
+### v1.8 — Video to GIF
+- Added **Video to GIF**: turn a clip into an animated GIF. Choose the start time, length, frames per second, and width.
+- Videos now show a small preview and their length before you run the tool.
+- Limit of 150 frames per GIF (for example, 15 seconds at 10 frames per second). The tool shows a clear message if you go over.
+- Dropping a video on the top card opens Video to GIF. Added a Video → GIF chip there too.
+- Works with formats your browser can play, usually MP4 and WebM. Some phone formats (like certain HEVC/.mov files) may not play in every browser.
+- Bumped the offline cache to v1.8.
 
 ### v1.7 — GIF Maker and GIF Remove Background
 - Added **GIF Maker**: turn 2 or more images into an animated GIF. Choose the frame delay, the width, and whether it loops forever or plays once. Set the frame order with ↑ ↓ before you run it.
