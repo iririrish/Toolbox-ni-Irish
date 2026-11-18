@@ -52,6 +52,23 @@ Every time the website is edited, this README is updated with a new entry in the
 
 ## Changelog
 
+### v1.3.1 — Dark mode text fix
+- Fixed text boxes showing black text on a dark background in dark mode. This affected Case Converter, Word Counter, and the text preview in PDF to Text and OCR. Text is now light in dark mode and dark in light mode.
+- Placeholder text ("Type or paste text…") now uses a softer color that is readable in both modes.
+- Dropdown menus and scrollbars now follow the current theme.
+
+### v1.3 — Previews for most tools
+- **Text results** (PDF to Text, OCR) now show the extracted text in a box on the page, with a **Copy text** button. Download still works.
+- **PDF results** (Merger, Splitter, Page Rotator, Image to PDF, PDF Scanner) now show page thumbnails (first 12 pages, first 6 files). Each result also has an **Open** link to view the full PDF in a new tab.
+- **PDF Merger** shows "3 files → 12 pages" and color-codes each thumbnail by the file it came from, so you can see where each file landed.
+- Image tools keep their image previews from v1.2.
+- PDF previews load pdf.js from cdnjs, so they need internet the first time.
+
+### v1.2 — Previews and Copy button
+- Removed the model download hint from the Background Remover.
+- Added a **preview** for image results. After you run an image tool, each result shows a thumbnail (with a checkerboard behind it so transparent areas are visible).
+- Added a **Copy** button to Background Remover results. It copies the image to your clipboard as a PNG, so you can paste it straight into chats, docs, or design apps. Download still works as before.
+
 ### v1.1.1 — Background Remover fix
 - Fixed the error "Expected void, received string" in Background Remover. The progress callback was returning a value, which the AI library rejects. It now returns nothing.
 
