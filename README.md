@@ -11,10 +11,31 @@ Every time the website is edited, this README is updated with a new entry in the
 ## How to host on GitHub Pages
 
 1. Create a new repository on GitHub.
-2. Upload `index.html` and `README.md` to the root of the repo.
+2. Upload all the files to the root of the repo: `index.html`, `sw.js`, `manifest.webmanifest`, `icon-192.png`, `icon-512.png`, `apple-touch-icon.png`, and `README.md`.
 3. Go to **Settings → Pages**.
 4. Set the source to **Deploy from a branch**, then choose `main` and `/(root)`.
 5. After a minute, the site is live at `https://<username>.github.io/<repo>/`.
+
+## Install on your phone (PWA)
+
+The site can be installed like an app. There is no app store or APK needed.
+
+- **Android (Chrome):** open your GitHub Pages link, tap the ⋮ menu, then **Install app** (or **Add to Home screen**). The **Install app** button on the site also works.
+- **iPhone (Safari):** open the link, tap Share, then **Add to Home Screen**.
+- It must be opened from the `https://` GitHub Pages link, not from the downloaded file.
+
+### Does it work offline?
+
+Open the app once while online. After that:
+
+| Works offline | Needs internet the first time, then works offline |
+|---------------|--------------------------------------------------|
+| Image Compressor, Resizer, Converter, Rotator, Image to PDF | Background Remover (downloads an AI model on first use) |
+| PDF Merger, Splitter, Page Rotator, PDF Scanner | OCR (downloads engine and language data on first use) |
+| PDF to JPG/PNG, PDF to Text, previews | |
+| Word Counter, Case Converter | |
+
+Offline support saves the page and its libraries in the browser's cache. If you clear your browser data, open the app online once more. Background Remover and OCR offline use has not been tested, so try them in airplane mode before relying on them.
 
 ## Tools
 
@@ -43,7 +64,7 @@ Every time the website is edited, this README is updated with a new entry in the
 
 ## Tech notes
 
-- Single static file: `index.html` (HTML, CSS, and JavaScript together).
+- The site itself is one file, `index.html` (HTML, CSS, and JavaScript together). The other files make it installable: `manifest.webmanifest` (app name and icons), `sw.js` (offline support), and the icon PNGs.
 - Libraries loaded from cdnjs: [pdf-lib](https://pdf-lib.js.org/) (merge, split, rotate PDFs) and [jsPDF](https://github.com/parallax/jsPDF) (Image to PDF, PDF Scanner).
 - Loaded only when a tool needs them: [pdf.js](https://mozilla.github.io/pdf.js/) (PDF to JPG/PNG, PDF to Text, OCR on PDFs) and [Tesseract.js](https://tesseract.projectnaptha.com/) (OCR).
 - Background Remover uses [@imgly/background-removal](https://github.com/imgly/background-removal-js), loaded from jsDelivr. Its AI model (about 40–80 MB) downloads on first use, then the browser caches it. Images are still processed on your device.
@@ -51,6 +72,14 @@ Every time the website is edited, this README is updated with a new entry in the
 - Favorites, recent tools, and theme are saved in the browser's `localStorage`.
 
 ## Changelog
+
+### v1.4 — Installable phone app with offline support
+- Made the site a **PWA**: it can be installed on Android and iPhone and opens full screen like an app.
+- Added `manifest.webmanifest`, `sw.js` (service worker), and app icons (`icon-192.png`, `icon-512.png`, `apple-touch-icon.png`).
+- Added an **Install app** button in the header. On Android it opens the install prompt. On iPhone it shows the Add to Home Screen steps.
+- The service worker saves the site and its libraries (pdf-lib, jsPDF, pdf.js, Tesseract.js) on first visit, so most tools work offline.
+- Background Remover and OCR models are saved after their first use.
+- Hid the Shortcuts button on phones, since phones have no keyboard.
 
 ### v1.3.1 — Dark mode text fix
 - Fixed text boxes showing black text on a dark background in dark mode. This affected Case Converter, Word Counter, and the text preview in PDF to Text and OCR. Text is now light in dark mode and dark in light mode.
