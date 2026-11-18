@@ -148,6 +148,10 @@ async function encode(i,w,h,type,q){const c=cv(w,h),x=c.getContext('2d');if(type
 const fmtOpt=(o)=>({k:'fmt',l:'Format',t:'select',o:o,v:o[0]});
 const MIME=f=>'image/'+(f==='jpg'?'jpeg':f);
 
+const ANY='image/*,application/pdf',CDN='https://cdnjs.cloudflare.com/ajax/libs/';
+const lib=src=>new Promise((ok,no)=>{if(lib.c[src])return ok();const e=document.createElement('script');e.src=src;e.onload=()=>{lib.c[src]=1;ok()};e.onerror=()=>no(new Error('Could not load a library. Check your internet connection.'));document.head.appendChild(e)});lib.c={};
+async function pdfjs(f){await lib(CDN+'pdf.js/3.11.174/pdf.min.js');pdfjsLib.GlobalWorkerOptions.workerSrc=CDN+'pdf.js/3.11.174/pdf.worker.min.js';return pdfjsLib.getDocument({data:await f.arrayBuffer()}).promise}
+async function renderPg(pdf,n,sc){const pg=await pdf.getPage(n),vp=pg.getViewport({scale:sc}),c=cv(Math.floor(vp.width),Math.floor(vp.height)),x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);await pg.render({canvasContext:x,viewport:vp}).promise;return c}
 const TOOLS=[
 {id:'compress',n:'Image Compressor',e:'🗜️',c:'Image',d:'Reduce image file size.',a:IMG,m:1,
  opts:[{k:'fmt',l:'Format',t:'select',o:['jpg','webp'],v:'jpg'},{k:'q',l:'Quality',t:'range',min:.1,max:1,step:.05,v:.7}],
@@ -174,11 +178,39 @@ const TOOLS=[
 {id:'pdfrotate',n:'PDF Page Rotator',e:'🔃',c:'PDF',d:'Rotate every page.',a:PDF,m:0,
  opts:[{k:'deg',l:'Rotate',t:'select',o:['90','180','270'],v:'90'}],
  run:async(fs,o)=>{const d=await PDFLib.PDFDocument.load(await fs[0].arrayBuffer());d.getPages().forEach(p=>p.setRotation(PDFLib.degrees((p.getRotation().angle+ +o.deg)%360)));return[{name:base(fs[0].name)+'-rotated.pdf',blob:new Blob([await d.save()],{type:PDF})}]}},
+{id:'bgremove',n:'Background Remover',e:'✨',c:'Image',d:'Cut out the background with AI.',a:IMG,m:1,hint:'The first run downloads an AI model (about 40–80 MB), then it is faster. Needs internet.',
+ opts:[{k:'bg',l:'Background',t:'select',o:['transparent','white'],v:'transparent'}],
+ run:async(fs,o,p)=>{p('Loading AI model…');const m=await import('https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/+esm'),out=[];
+  for(let i=0;i<fs.length;i++){const lb=`Image ${i+1}/${fs.length}…`;p(lb);let b=await m.removeBackground(fs[i],{output:{format:'image/png'},progress:(k,c,t)=>p(String(k).startsWith('fetch')&&t?`Downloading model ${Math.round(c/t*100)}%`:lb)});
+   if(o.bg==='white'){const im=await loadImg(b);b=await encode(im,im.naturalWidth,im.naturalHeight,'image/jpeg',.95)}
+   out.push({name:base(fs[i].name)+'-no-bg.'+(o.bg==='white'?'jpg':'png'),blob:b})}return out}},
+{id:'pdf2jpg',n:'PDF to JPG/PNG',e:'🖼️',c:'PDF',d:'Turn every PDF page into an image.',a:PDF,m:0,
+ opts:[{k:'fmt',l:'Format',t:'select',o:['jpg','png'],v:'jpg'},{k:'s',l:'Scale (2 = sharp)',t:'select',o:['1','1.5','2','3'],v:'2'}],
+ run:async(fs,o,p)=>{const pdf=await pdfjs(fs[0]),out=[];for(let i=1;i<=pdf.numPages;i++){p(`Page ${i}/${pdf.numPages}…`);const c=await renderPg(pdf,i,+o.s);out.push({name:base(fs[0].name)+'-p'+i+'.'+o.fmt,blob:await toBlob(c,MIME(o.fmt),.92)})}return out}},
+{id:'pdf2text',n:'PDF to Text',e:'📝',c:'PDF',d:'Extract text from a PDF.',a:PDF,m:0,
+ run:async(fs,o,p)=>{const pdf=await pdfjs(fs[0]);let t='';for(let i=1;i<=pdf.numPages;i++){p(`Page ${i}/${pdf.numPages}…`);const tc=await(await pdf.getPage(i)).getTextContent();let ln='';tc.items.forEach(it=>{ln+=it.str+(it.hasEOL?'\n':' ')});t+=ln.trim()+'\n\n'}
+  if(!t.trim())throw new Error('No text found. This looks like a scanned PDF, so try the OCR tool.');return[{name:base(fs[0].name)+'.txt',blob:new Blob([t],{type:'text/plain'}),note:t.length+' characters'}]}},
+{id:'scanner',n:'PDF Scanner',e:'📷',c:'PDF',d:'Turn photos of paper into a clean PDF.',a:IMG,m:1,hint:'On a phone, pick “Take photo” to use your camera. Add pages in order.',
+ opts:[{k:'mode',l:'Mode',t:'select',o:['color','gray','bw'],v:'color'},{k:'c',l:'Contrast',t:'range',min:1,max:2.5,step:.1,v:1.4}],
+ run:async(fs,o,p)=>{let doc;for(let i=0;i<fs.length;i++){p(`Page ${i+1}/${fs.length}…`);const im=await loadImg(fs[i]),k=Math.min(1,2000/Math.max(im.naturalWidth,im.naturalHeight)),w=Math.round(im.naturalWidth*k),h=Math.round(im.naturalHeight*k),c=cv(w,h),x=c.getContext('2d');x.drawImage(im,0,0,w,h);
+  const d=x.getImageData(0,0,w,h),a=d.data;let sum=0;for(let j=0;j<a.length;j+=4)sum+=.299*a[j]+.587*a[j+1]+.114*a[j+2];
+  const g=Math.min(1.8,Math.max(1,235/(sum/(a.length/4)))),cc=+o.c,f=v=>Math.max(0,Math.min(255,(v*g-128)*cc+128));
+  for(let j=0;j<a.length;j+=4){if(o.mode==='color'){a[j]=f(a[j]);a[j+1]=f(a[j+1]);a[j+2]=f(a[j+2])}else{let v=f(.299*a[j]+.587*a[j+1]+.114*a[j+2]);if(o.mode==='bw')v=v>150?255:0;a[j]=a[j+1]=a[j+2]=v}}
+  x.putImageData(d,0,0);const u=c.toDataURL('image/jpeg',.85),or=w>h?'l':'p';
+  if(!doc)doc=new jspdf.jsPDF({orientation:or,unit:'px',format:[w,h],hotfixes:['px_scaling']});else doc.addPage([w,h],or);doc.addImage(u,'JPEG',0,0,w,h)}
+  return[{name:'scan.pdf',blob:doc.output('blob')}]}},
+{id:'ocr',n:'OCR (Image or PDF to Text)',e:'🔍',c:'Text',d:'Read text from photos and scanned PDFs.',a:ANY,m:1,hint:'The first run downloads language data. Needs internet. tgl = Tagalog.',
+ opts:[{k:'l',l:'Language',t:'select',o:['eng','tgl','spa','fra','deu'],v:'eng'}],
+ run:async(fs,o,p)=>{p('Loading OCR engine…');await lib(CDN+'tesseract.js/5.0.5/tesseract.min.js');const w=await Tesseract.createWorker(o.l),out=[];
+  try{for(let i=0;i<fs.length;i++){const f=fs[i];let t='';
+   if(f.type===PDF){const pdf=await pdfjs(f);for(let n=1;n<=pdf.numPages;n++){p(`File ${i+1}/${fs.length}, page ${n}/${pdf.numPages}…`);t+=(await w.recognize(await renderPg(pdf,n,2))).data.text+'\n\n'}}
+   else{p(`File ${i+1}/${fs.length}…`);t=(await w.recognize(f)).data.text}
+   out.push({name:base(f.name)+'.txt',blob:new Blob([t],{type:'text/plain'}),note:t.trim()?t.length+' characters':'no text found'})}}finally{await w.terminate()}return out}},
 {id:'wordcount',n:'Word Counter',e:'🔢',c:'Text',d:'Count words, characters, sentences.',text:1},
 {id:'case',n:'Case Converter',e:'🔤',c:'Text',d:'UPPER, lower, Title, Sentence.',text:2}
 ];
-const SOON={Image:['Image Cropper','Background Remover','Color Picker','Metadata Viewer','Favicon Generator','QR Code from Image','Blur or Pixelate','Add Watermark','Border and Rounded Corners'],
-PDF:['PDF to JPG/PNG','Page Numbers','Watermarks','Password Protection','PDF Unlocker','PDF to Text','Text to PDF','PDF Compare','PDF Signature','PDF Form Filler','PDF Compressor'],Text:[]};
+const SOON={Image:['Image Cropper','Color Picker','Metadata Viewer','Favicon Generator','QR Code from Image','Blur or Pixelate','Add Watermark','Border and Rounded Corners'],
+PDF:['Page Numbers','Watermarks','Password Protection','PDF Unlocker','Text to PDF','PDF Compare','PDF Signature','PDF Form Filler','PDF Compressor'],Text:[]};
 Object.entries(SOON).forEach(([c,a])=>a.forEach(n=>TOOLS.push({id:'s-'+n,n,e:'⏳',c,d:'Planned.',soon:1})));
 const CATS=[['Image','🖼️','Compress, resize, convert'],['PDF','📑','Merge, split, edit'],['Text','✍️','Format, count, convert']];
 const get=id=>TOOLS.find(t=>t.id===id);
@@ -203,7 +235,7 @@ $('#n-tools').textContent=TOOLS.filter(t=>!t.soon).length;
 $('#q').oninput=render;
 
 /* hero converter */
-[['→ JPG','convert','jpg'],['→ PNG','convert','png'],['→ WEBP','convert','webp'],['Image → PDF','img2pdf'],['Compress','compress'],['Resize','resize'],['Merge PDF','pdfmerge'],['Split PDF','pdfsplit']].forEach(([l,id,v])=>{const b=document.createElement('button');b.className='chip';b.textContent=l;b.onclick=()=>openTool(id,null,v);$('#chips').appendChild(b)});
+[['→ JPG','convert','jpg'],['→ PNG','convert','png'],['→ WEBP','convert','webp'],['Image → PDF','img2pdf'],['Compress','compress'],['Resize','resize'],['Remove background','bgremove'],['PDF → JPG','pdf2jpg'],['OCR','ocr'],['Merge PDF','pdfmerge'],['Split PDF','pdfsplit']].forEach(([l,id,v])=>{const b=document.createElement('button');b.className='chip';b.textContent=l;b.onclick=()=>openTool(id,null,v);$('#chips').appendChild(b)});
 const hp=document.createElement('input');hp.type='file';hp.multiple=true;hp.accept='image/*,application/pdf';
 function route(fs){fs=[...fs];if(!fs.length)return;const pdfs=fs.filter(f=>f.type===PDF),imgs=fs.filter(f=>f.type.startsWith('image/'));
  if(pdfs.length&&!imgs.length)openTool(pdfs.length>1?'pdfmerge':'pdfsplit',pdfs);else if(imgs.length)openTool('convert',imgs);}
@@ -219,8 +251,8 @@ function openTool(id,pre,val){const t=get(id);cur=t;files=pre?[...pre]:[];
  recent=[id,...recent.filter(x=>x!==id)].slice(0,6);ls.set('recent',recent);render();
  $('#d-title').textContent=t.e+' '+t.n;const B=$('#d-body');B.innerHTML='';
  if(t.text){textUI(t,B);dlg.showModal();return}
- const acc=t.a==='image/*'?'image':'PDF';
- B.innerHTML=`<div class="drop" id="td" tabindex="0" role="button"><h3>Drop ${acc} files here</h3><small>or click to choose${t.m?' (multiple allowed)':''}</small></div><div class="files" id="fl"></div><div id="op" style="display:grid;gap:10px"></div><div class="row"><button class="btn p" id="run">Run</button><button class="btn" id="clr">Clear</button></div><div class="res" id="rs"></div><div class="err" id="er"></div>`;
+ const acc=t.a===IMG?'image':t.a===PDF?'PDF':'image or PDF';
+ B.innerHTML=`<div class="drop" id="td" tabindex="0" role="button"><h3>Drop ${acc} files here</h3><small>or click to choose${t.m?' (multiple allowed)':''}</small></div><div class="files" id="fl"></div><small style="color:var(--mute)">${t.hint||''}</small><div id="op" style="display:grid;gap:10px"></div><div class="row"><button class="btn p" id="run">Run</button><button class="btn" id="clr">Clear</button></div><div class="res" id="rs"></div><div class="err" id="er"></div>`;
  const op=$('#op'),vals={};
  (t.opts||[]).forEach(o=>{vals[o.k]=(id==='convert'&&o.k==='fmt'&&val)?val:o.v;const w=document.createElement('label');w.className='opt';w.innerHTML=`<span>${o.l}</span>`;let el;
   if(o.t==='select'){el=document.createElement('select');o.o.forEach(x=>{const p=document.createElement('option');p.value=p.textContent=x;el.appendChild(p)})}
@@ -232,14 +264,14 @@ function openTool(id,pre,val){const t=get(id);cur=t;files=pre?[...pre]:[];
  ['dragover','dragenter'].forEach(ev=>td.addEventListener(ev,e=>{e.preventDefault();td.classList.add('over')}));
  ['dragleave','drop'].forEach(ev=>td.addEventListener(ev,e=>{e.preventDefault();td.classList.remove('over')}));
  td.addEventListener('drop',e=>add(e.dataTransfer.files));
- const ok=f=>t.a==='image/*'?f.type.startsWith('image/'):f.type===PDF;
+ const ok=f=>(t.a.includes('image')&&f.type.startsWith('image/'))||(t.a.includes('pdf')&&f.type===PDF);
  function add(l){const g=[...l].filter(ok);files=t.m?[...files,...g]:g.slice(0,1);list()}
  function list(){$('#fl').innerHTML=files.map(f=>`<div>• ${f.name.replace(/</g,'&lt;')} (${mb(f.size)})</div>`).join('');$('#rs').innerHTML='';$('#er').textContent=''}
  $('#clr').onclick=()=>{files=[];list()};
  $('#run').onclick=window.runCur=async()=>{const er=$('#er');er.textContent='';$('#rs').innerHTML='';
   if(files.length<(t.min||1)){er.textContent=t.min?`Add at least ${t.min} files.`:'Add a file first.';return}
   const btn=$('#run');btn.disabled=true;btn.textContent='Working…';
-  try{const out=await t.run(files,vals);urls.forEach(URL.revokeObjectURL);urls=[];
+  try{const out=await t.run(files,vals,s=>btn.textContent=s);urls.forEach(URL.revokeObjectURL);urls=[];
    $('#rs').innerHTML='';out.forEach(r=>{const u=URL.createObjectURL(r.blob);urls.push(u);const d=document.createElement('div');d.className='r';d.innerHTML=`<span></span><a download>Download</a>`;d.firstChild.textContent=r.name+(r.note?' · '+r.note:'');d.lastChild.href=u;d.lastChild.download=r.name;$('#rs').appendChild(d)})}
   catch(e){er.textContent='Could not process: '+(e.message||'file may be corrupted or password-protected.')}
   btn.disabled=false;btn.textContent='Run'};
