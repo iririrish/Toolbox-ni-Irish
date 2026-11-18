@@ -30,7 +30,7 @@ Open the app once while online. After that:
 
 | Works offline | Needs internet the first time, then works offline |
 |---------------|--------------------------------------------------|
-| Image Compressor, Resizer, Converter, Rotator, Image to PDF | Background Remover (downloads an AI model on first use) |
+| Image Compressor, Resizer, Converter, Rotator, Image to PDF | Background Remover (downloads an AI model on first use), GIF Maker and GIF Remove Background (load small libraries on first use; the AI method also downloads the model) |
 | PDF Merger, Splitter, Page Rotator, PDF Scanner | OCR (downloads engine and language data on first use) |
 | PDF to JPG/PNG, PDF to Text, previews | |
 | Word Counter, Case Converter | |
@@ -43,7 +43,7 @@ Offline support saves the page and its libraries in the browser's cache. If you 
 
 | Category | Tools |
 |----------|-------|
-| Image | Image Compressor, Image Resizer, Image Converter (PNG/JPG/WEBP), Image Rotator and Flipper, Image to PDF, Background Remover |
+| Image | Image Compressor, Image Resizer, Image Converter (PNG/JPG/WEBP), Image Rotator and Flipper, Image to PDF, Background Remover, GIF Maker, GIF Remove Background |
 | PDF | PDF Merger, PDF Splitter / Page Extractor, PDF Page Rotator, PDF to JPG/PNG, PDF to Text, PDF Scanner |
 | Text | Word Counter, Case Converter, OCR (image or scanned PDF to text) |
 
@@ -69,9 +69,25 @@ Offline support saves the page and its libraries in the browser's cache. If you 
 - Loaded only when a tool needs them: [pdf.js](https://mozilla.github.io/pdf.js/) (PDF to JPG/PNG, PDF to Text, OCR on PDFs) and [Tesseract.js](https://tesseract.projectnaptha.com/) (OCR).
 - Background Remover uses [@imgly/background-removal](https://github.com/imgly/background-removal-js), loaded from jsDelivr. Its AI model (about 40–80 MB) downloads on first use, then the browser caches it. Images are still processed on your device.
 - OCR downloads language data on first use. These tools need an internet connection the first time.
+- GIF Maker uses [gifenc](https://github.com/mattdesl/gifenc) to build GIFs. GIF Remove Background uses [gifuct-js](https://github.com/matt-way/gifuct-js) to read GIF frames, then gifenc to save them. Both load from jsDelivr when first used.
 - Favorites, recent tools, and theme are saved in the browser's `localStorage`.
 
 ## Changelog
+
+### v1.7 — GIF Maker and GIF Remove Background
+- Added **GIF Maker**: turn 2 or more images into an animated GIF. Choose the frame delay, the width, and whether it loops forever or plays once. Set the frame order with ↑ ↓ before you run it.
+- Added **GIF Remove Background**: make a GIF's background transparent. It has two methods:
+  - **Solid color** (fast): removes a plain background. Choose auto (top-left pixel), white, black, green, or a custom color, and set the tolerance. It only removes background that touches the edges, so matching colors inside the subject (for example, white eyes) stay.
+  - **AI** (slow): works on any background, one frame at a time. Limited to 80 frames.
+- GIF transparency is on or off per pixel, so edges can look slightly rough compared with PNG.
+- Removed both tools from the "soon" list and added a GIF Maker chip to the hero card.
+- Bumped the offline cache to v1.7.
+
+### v1.6 — Preview before processing, GIF tools coming soon
+- **Preview before processing:** files you add now show a thumbnail before you press Run. Images show the picture. PDFs show page 1 and the page count.
+- Each file has a **×** button to remove it. When a tool takes several files (for example PDF Merger or Image to PDF), each file also has **↑ ↓** buttons to change the order before you run it.
+- Added **GIF Maker** and **GIF Remove Background** as "soon" cards. They are planned and not built yet.
+- Bumped the offline cache to v1.6 so phones pick up the update.
 
 ### v1.5 — Vertical previews and custom scrollbar
 - PDF previews now scroll **up and down** instead of sideways, so there is no horizontal slider. Pages stack in one column and the preview box scrolls vertically. This works on phones too.
