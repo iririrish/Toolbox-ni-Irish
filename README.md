@@ -74,6 +74,14 @@ Offline support saves the page and its libraries in the browser's cache. If you 
 
 ## Changelog
 
+### v1.10 — Photo Frame Maker now removes #00FF00
+- Changed **Photo Frame Maker**. It no longer looks for photo slots on its own. It now removes pure green (**#00FF00**) from the image and makes it transparent, so you can fill your frame's slots with green and get see-through slots.
+- Options: the color to remove (default #00FF00), **Tolerance (%)** for green that is not perfectly pure (for example after JPG compression), and **Clean green edges (px)**, which removes the light green fringe left at the edge of the slots. It only trims greenish pixels, so the frame edge stays.
+- Other colors, such as the frame, flowers, and text, are kept. Green decorations that are not close to #00FF00 are kept too.
+- Saves a PNG to keep the transparency. If no green is found, it tells you to raise the tolerance or check the color.
+- Removed the automatic slot detection and the outside-background options from this tool.
+- Bumped the offline cache to v1.10.
+
 ### v1.9 — Photo Frame Maker
 - Added **Photo Frame Maker**: upload a frame such as a Canva photo strip and it makes the photo slots transparent, so you can put your own photos behind the frame. It saves a PNG, which keeps the transparency.
 - It finds the frame color on its own, then finds the large boxes inside the frame and clears them. Small decorations (flowers, stickers, text) and the frame itself are kept.
