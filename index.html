@@ -10,11 +10,12 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
-:root{--bg:#f6f8fc;--card:#fff;--ink:#12172b;--mute:#667089;--line:#e2e7f0;--acc:#4b4bff;--acc2:#e9e9ff;--ok:#12a366;--okbg:#e3f6ed}
-:root[data-theme=dark]{--bg:#0e1220;--card:#171c2e;--ink:#eef0f8;--mute:#9aa3bd;--line:#2a3150;--acc:#8a8aff;--acc2:#262a5a;--ok:#3dd68c;--okbg:#14352a}
+:root{color-scheme:light;--bg:#f6f8fc;--card:#fff;--ink:#12172b;--mute:#667089;--line:#e2e7f0;--acc:#4b4bff;--acc2:#e9e9ff;--ok:#12a366;--okbg:#e3f6ed}
+:root[data-theme=dark]{color-scheme:dark;--bg:#0e1220;--card:#171c2e;--ink:#eef0f8;--mute:#9aa3bd;--line:#2a3150;--acc:#8a8aff;--acc2:#262a5a;--ok:#3dd68c;--okbg:#14352a}
 *{box-sizing:border-box}html{scroll-behavior:smooth}
 body{margin:0;font-family:Inter,system-ui,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
-button,input,select{font:inherit;color:inherit}
+button,input,select,textarea{font:inherit;color:inherit}
+::placeholder{color:var(--mute);opacity:1}
 :focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 .wrap{max-width:1120px;margin:0 auto;padding:0 20px}
 header{background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
@@ -73,8 +74,12 @@ textarea{min-height:140px;resize:vertical}
 .res{display:grid;gap:8px}
 .r{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:13px}
 .r a{color:var(--acc);font-weight:600;text-decoration:none;white-space:nowrap}
-.r.img{flex-direction:column;align-items:stretch}.r .bar{display:flex;justify-content:space-between;align-items:center;gap:10px}.r .btn{padding:4px 10px;font-size:13px}.r .row{align-items:center}
+.r.pv-r{flex-direction:column;align-items:stretch}.r .bar{display:flex;justify-content:space-between;align-items:center;gap:10px}.r .btn{padding:4px 10px;font-size:13px}.r .row{align-items:center}
 .pv{max-height:160px;max-width:100%;object-fit:contain;align-self:center;border-radius:8px;background:conic-gradient(#ccc 25%,#fff 0 50%,#ccc 0 75%,#fff 0) 0 0/16px 16px}
+.pt{height:180px;font-size:13px}.ph{font-size:12px;color:var(--mute);margin-bottom:6px}
+.strip{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px}
+figure{margin:0;flex:none;text-align:center;border:2px solid var(--c,var(--line));border-radius:8px;padding:4px;background:var(--card)}
+figure canvas{display:block;width:150px;height:auto;border-radius:4px}figcaption{font-size:11px;color:var(--mute);margin-top:2px}
 .err{color:#d9364f;font-size:14px}
 .row{display:flex;gap:8px;flex-wrap:wrap}
 .cnt{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center}
@@ -170,7 +175,7 @@ const TOOLS=[
 {id:'img2pdf',n:'Image to PDF',e:'📄',c:'Image',d:'Combine images into one PDF.',a:IMG,m:1,
  opts:[],run:async fs=>{let doc;for(const f of fs){const i=await loadImg(f),w=i.naturalWidth,h=i.naturalHeight;const c=cv(w,h),x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,w,h);x.drawImage(i,0,0);const u=c.toDataURL('image/jpeg',.92),or=w>h?'l':'p';if(!doc)doc=new jspdf.jsPDF({orientation:or,unit:'px',format:[w,h],hotfixes:['px_scaling']});else doc.addPage([w,h],or);doc.addImage(u,'JPEG',0,0,w,h)}return[{name:'images.pdf',blob:doc.output('blob')}]}},
 {id:'pdfmerge',n:'PDF Merger',e:'🧩',c:'PDF',d:'Combine multiple PDFs. Files merge in the order added.',a:PDF,m:1,min:2,
- opts:[],run:async fs=>{const out=await PDFLib.PDFDocument.create();for(const f of fs){const d=await PDFLib.PDFDocument.load(await f.arrayBuffer());(await out.copyPages(d,d.getPageIndices())).forEach(p=>out.addPage(p))}return[{name:'merged.pdf',blob:new Blob([await out.save()],{type:PDF})}]}},
+ opts:[],run:async fs=>{const out=await PDFLib.PDFDocument.create(),parts=[];for(const f of fs){const d=await PDFLib.PDFDocument.load(await f.arrayBuffer());(await out.copyPages(d,d.getPageIndices())).forEach(p=>out.addPage(p));parts.push(d.getPageCount())}return[{name:'merged.pdf',blob:new Blob([await out.save()],{type:PDF}),note:fs.length+' files → '+out.getPageCount()+' pages',parts}]}},
 {id:'pdfsplit',n:'PDF Splitter / Page Extractor',e:'✂️',c:'PDF',d:'Separate pages or pull out a range.',a:PDF,m:0,
  opts:[{k:'r',l:'Pages',t:'text',v:'',ph:'e.g. 1-3,5 (blank = every page)'}],
  run:async(fs,o)=>{const src=await PDFLib.PDFDocument.load(await fs[0].arrayBuffer()),n=src.getPageCount(),mk=async idx=>{const d=await PDFLib.PDFDocument.create();(await d.copyPages(src,idx)).forEach(p=>d.addPage(p));return new Blob([await d.save()],{type:PDF})};
@@ -247,6 +252,35 @@ const hd=$('#hdrop');['dragover','dragenter'].forEach(ev=>hd.addEventListener(ev
 ['dragleave','drop'].forEach(ev=>hd.addEventListener(ev,e=>{e.preventDefault();hd.classList.remove('over')}));
 hd.addEventListener('drop',e=>route(e.dataTransfer.files));
 
+
+const COL=['#4b4bff','#12a366','#f5a623','#d9364f','#9b51e0','#0ea5c6'];
+function addResult(r,i,t){
+ const u=URL.createObjectURL(r.blob),ty=r.blob.type,d=document.createElement('div');urls.push(u);
+ const kind=ty.startsWith('image/')?'img':ty===PDF?'pdf':ty.startsWith('text/')?'txt':'';
+ d.className='r'+(kind?' pv-r':'');
+ d.innerHTML='<div class="bar"><span></span><div class="row"></div></div>';
+ const bar=d.firstChild,act=d.querySelector('.row');
+ d.querySelector('span').textContent=r.name+(r.note?' · '+r.note:'');
+ const btn=(txt,ok,fn)=>{const b=document.createElement('button');b.className='btn';b.textContent=txt;b.onclick=async()=>{try{await fn();b.textContent=ok}catch(e){b.textContent='Failed'}setTimeout(()=>{b.textContent=txt},2000)};act.appendChild(b)};
+ let pv=null;
+ if(kind==='img'){pv=document.createElement('img');pv.className='pv';pv.alt='Preview';pv.src=u;
+  if(t.copy)btn('Copy','Copied!',async()=>{const png=ty==='image/png'?Promise.resolve(r.blob):loadImg(r.blob).then(x=>encode(x,x.naturalWidth,x.naturalHeight,'image/png'));await navigator.clipboard.write([new ClipboardItem({'image/png':png})])})}
+ if(kind==='txt'){pv=document.createElement('textarea');pv.className='pt';pv.readOnly=true;pv.value='Loading…';r.blob.text().then(x=>{pv.value=x.trim()?x:'(no text found)'});
+  btn('Copy text','Copied!',()=>navigator.clipboard.writeText(pv.value))}
+ if(kind==='pdf'){if(i<6){pv=document.createElement('div');pv.className='pgs';pdfPreview(r,pv)}
+  const o=document.createElement('a');o.textContent='Open';o.href=u;o.target='_blank';o.rel='noopener';act.appendChild(o)}
+ const a=document.createElement('a');a.textContent='Download';a.href=u;a.download=r.name;act.appendChild(a);
+ if(pv)d.insertBefore(pv,bar);$('#rs').appendChild(d)}
+async function pdfPreview(r,box){
+ box.textContent='Loading preview…';
+ try{const pdf=await pdfjs(r.blob),n=pdf.numPages,cap=Math.min(n,12),parts=r.parts||[],cum=[];
+  parts.reduce((x,y,k)=>(cum[k]=x+y),0);box.textContent='';
+  const h=document.createElement('div');h.className='ph';h.textContent=n+' page'+(n>1?'s':'')+(n>cap?' · showing first '+cap:'');box.appendChild(h);
+  const st=document.createElement('div');st.className='strip';box.appendChild(st);
+  for(let i=1;i<=cap;i++){const pg=await pdf.getPage(i),c=await renderPg(pdf,i,150/pg.getViewport({scale:1}).width),f=document.createElement('figure'),cp=document.createElement('figcaption');
+   if(parts.length){let k=0;while(i>cum[k])k++;f.style.setProperty('--c',COL[k%COL.length]);cp.textContent='p'+i+' · file '+(k+1)}else cp.textContent='Page '+i;
+   f.append(c,cp);st.appendChild(f)}
+ }catch(e){box.textContent='Preview not available (needs internet the first time).'}}
 /* tool dialog */
 const dlg=$('#dlg'),kdlg=$('#kdlg');let cur=null,files=[],urls=[];
 function openTool(id,pre,val){const t=get(id);cur=t;files=pre?[...pre]:[];
@@ -274,13 +308,7 @@ function openTool(id,pre,val){const t=get(id);cur=t;files=pre?[...pre]:[];
   if(files.length<(t.min||1)){er.textContent=t.min?`Add at least ${t.min} files.`:'Add a file first.';return}
   const btn=$('#run');btn.disabled=true;btn.textContent='Working…';
   try{const out=await t.run(files,vals,s=>{btn.textContent=s});urls.forEach(URL.revokeObjectURL);urls=[];
-   $('#rs').innerHTML='';out.forEach(r=>{const u=URL.createObjectURL(r.blob),isImg=r.blob.type.startsWith('image/'),d=document.createElement('div');urls.push(u);d.className='r'+(isImg?' img':'');
-    d.innerHTML=(isImg?'<img class="pv" alt="Preview">':'')+'<div class="bar"><span></span><div class="row"></div></div>';
-    if(isImg)d.querySelector('.pv').src=u;
-    d.querySelector('span').textContent=r.name+(r.note?' · '+r.note:'');
-    const act=d.querySelector('.row'),a=document.createElement('a');a.textContent='Download';a.href=u;a.download=r.name;
-    if(isImg&&t.copy){const cb=document.createElement('button');cb.className='btn';cb.textContent='Copy';cb.onclick=async()=>{try{const png=r.blob.type==='image/png'?Promise.resolve(r.blob):loadImg(r.blob).then(i=>encode(i,i.naturalWidth,i.naturalHeight,'image/png'));await navigator.clipboard.write([new ClipboardItem({'image/png':png})]);cb.textContent='Copied!'}catch(e){cb.textContent='Copy failed'}setTimeout(()=>{cb.textContent='Copy'},2000)};act.appendChild(cb)}
-    act.appendChild(a);$('#rs').appendChild(d)})}
+   $('#rs').innerHTML='';out.forEach((r,i)=>addResult(r,i,t))}
   catch(e){er.textContent='Could not process: '+(e.message||'file may be corrupted or password-protected.')}
   btn.disabled=false;btn.textContent='Run'};
  list();dlg.showModal()}
