@@ -30,7 +30,7 @@ Open the app once while online. After that:
 
 | Works offline | Needs internet the first time, then works offline |
 |---------------|--------------------------------------------------|
-| Image Compressor, Resizer, Converter, Rotator, Image to PDF | Background Remover (downloads an AI model on first use), GIF Maker, Video to GIF and GIF Remove Background (load small libraries on first use; the AI method also downloads the model) |
+| Image Compressor, Resizer, Converter, Rotator, Image to PDF, Photo Frame Maker | Background Remover (downloads an AI model on first use), GIF Maker, Video to GIF and GIF Remove Background (load small libraries on first use; the AI method also downloads the model) |
 | PDF Merger, Splitter, Page Rotator, PDF Scanner | OCR (downloads engine and language data on first use) |
 | PDF to JPG/PNG, PDF to Text, previews | |
 | Word Counter, Case Converter | |
@@ -43,7 +43,7 @@ Offline support saves the page and its libraries in the browser's cache. If you 
 
 | Category | Tools |
 |----------|-------|
-| Image | Image Compressor, Image Resizer, Image Converter (PNG/JPG/WEBP), Image Rotator and Flipper, Image to PDF, Background Remover, GIF Maker, GIF Remove Background, Video to GIF |
+| Image | Image Compressor, Image Resizer, Image Converter (PNG/JPG/WEBP), Image Rotator and Flipper, Image to PDF, Background Remover, GIF Maker, GIF Remove Background, Video to GIF, Photo Frame Maker |
 | PDF | PDF Merger, PDF Splitter / Page Extractor, PDF Page Rotator, PDF to JPG/PNG, PDF to Text, PDF Scanner |
 | Text | Word Counter, Case Converter, OCR (image or scanned PDF to text) |
 
@@ -73,6 +73,14 @@ Offline support saves the page and its libraries in the browser's cache. If you 
 - Favorites, recent tools, and theme are saved in the browser's `localStorage`.
 
 ## Changelog
+
+### v1.9 — Photo Frame Maker
+- Added **Photo Frame Maker**: upload a frame such as a Canva photo strip and it makes the photo slots transparent, so you can put your own photos behind the frame. It saves a PNG, which keeps the transparency.
+- It finds the frame color on its own, then finds the large boxes inside the frame and clears them. Small decorations (flowers, stickers, text) and the frame itself are kept.
+- It can also remove a plain background around the frame. It skips this on its own if it would erase the frame.
+- Options: turn slots and outside removal on or off, set how closely colors must match the frame, expand the slots by a few pixels so no edge shows, or pick the frame color yourself.
+- Tested on a three-photo strip with flowers on the edges. Slots with very round or irregular shapes, or frames with photos that are dark right up to the edge, may need the Frame match slider or a custom frame color.
+- Bumped the offline cache to v1.9.
 
 ### v1.8 — Video to GIF
 - Added **Video to GIF**: turn a clip into an animated GIF. Choose the start time, length, frames per second, and width.
