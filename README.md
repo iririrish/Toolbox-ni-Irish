@@ -52,6 +52,9 @@ Every time the website is edited, this README is updated with a new entry in the
 
 ## Changelog
 
+### v1.1.1 — Background Remover fix
+- Fixed the error "Expected void, received string" in Background Remover. The progress callback was returning a value, which the AI library rejects. It now returns nothing.
+
 ### v1.1 — Background Remover, PDF to JPG, PDF to Text, OCR, Scanner
 - Added **Background Remover** (AI, transparent or white background).
 - Added **PDF to JPG/PNG** (one image per page, choose scale).
