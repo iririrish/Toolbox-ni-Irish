@@ -181,7 +181,7 @@ const TOOLS=[
 {id:'bgremove',n:'Background Remover',e:'✨',c:'Image',d:'Cut out the background with AI.',a:IMG,m:1,hint:'The first run downloads an AI model (about 40–80 MB), then it is faster. Needs internet.',
  opts:[{k:'bg',l:'Background',t:'select',o:['transparent','white'],v:'transparent'}],
  run:async(fs,o,p)=>{p('Loading AI model…');const m=await import('https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/+esm'),out=[];
-  for(let i=0;i<fs.length;i++){const lb=`Image ${i+1}/${fs.length}…`;p(lb);let b=await m.removeBackground(fs[i],{output:{format:'image/png'},progress:(k,c,t)=>p(String(k).startsWith('fetch')&&t?`Downloading model ${Math.round(c/t*100)}%`:lb)});
+  for(let i=0;i<fs.length;i++){const lb=`Image ${i+1}/${fs.length}…`;p(lb);let b=await m.removeBackground(fs[i],{output:{format:'image/png'},progress:(k,c,t)=>{p(String(k).startsWith('fetch')&&t?`Downloading model ${Math.round(c/t*100)}%`:lb)}});
    if(o.bg==='white'){const im=await loadImg(b);b=await encode(im,im.naturalWidth,im.naturalHeight,'image/jpeg',.95)}
    out.push({name:base(fs[i].name)+'-no-bg.'+(o.bg==='white'?'jpg':'png'),blob:b})}return out}},
 {id:'pdf2jpg',n:'PDF to JPG/PNG',e:'🖼️',c:'PDF',d:'Turn every PDF page into an image.',a:PDF,m:0,
@@ -271,7 +271,7 @@ function openTool(id,pre,val){const t=get(id);cur=t;files=pre?[...pre]:[];
  $('#run').onclick=window.runCur=async()=>{const er=$('#er');er.textContent='';$('#rs').innerHTML='';
   if(files.length<(t.min||1)){er.textContent=t.min?`Add at least ${t.min} files.`:'Add a file first.';return}
   const btn=$('#run');btn.disabled=true;btn.textContent='Working…';
-  try{const out=await t.run(files,vals,s=>btn.textContent=s);urls.forEach(URL.revokeObjectURL);urls=[];
+  try{const out=await t.run(files,vals,s=>{btn.textContent=s});urls.forEach(URL.revokeObjectURL);urls=[];
    $('#rs').innerHTML='';out.forEach(r=>{const u=URL.createObjectURL(r.blob);urls.push(u);const d=document.createElement('div');d.className='r';d.innerHTML=`<span></span><a download>Download</a>`;d.firstChild.textContent=r.name+(r.note?' · '+r.note:'');d.lastChild.href=u;d.lastChild.download=r.name;$('#rs').appendChild(d)})}
   catch(e){er.textContent='Could not process: '+(e.message||'file may be corrupted or password-protected.')}
   btn.disabled=false;btn.textContent='Run'};
