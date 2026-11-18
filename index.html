@@ -95,7 +95,7 @@ figure{margin:0;flex:none;width:100%;max-width:380px;text-align:center;border:2p
 figure canvas{display:block;width:100%;height:auto;border-radius:4px}figcaption{font-size:11px;color:var(--mute);margin-top:2px}
 .fi{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:10px;padding:6px 8px}
 .th{width:44px;height:56px;flex:none;border-radius:6px;overflow:hidden;background:var(--bg);display:grid;place-items:center;font-size:10px;color:var(--mute)}
-.th img,.th canvas{max-width:100%;max-height:100%;object-fit:contain}
+.th img,.th canvas,.th video{max-width:100%;max-height:100%;object-fit:contain}
 .fm{flex:1;min-width:0;display:flex;flex-direction:column}.fm b{font-size:13px;font-weight:500;color:var(--ink);overflow-wrap:anywhere}.fm small{font-size:12px;color:var(--mute)}
 .fi .btn{padding:2px 9px;font-size:14px}
 .err{color:#d9364f;font-size:14px}
@@ -270,6 +270,21 @@ const TOOLS=[
    for(let k=0;k<idx.length;k++)if(d[k*4+3]===0){idx[k]=ti;any=true}
    g.writeFrame(idx,W,H,{palette:pal,delay:Math.max(20,frames[i].delay||100),transparent:any,transparentIndex:ti,dispose:2,repeat:0})}
   g.finish();const b=new Blob([g.bytes()],{type:'image/gif'});return[{name:base(fs[0].name)+'-no-bg.gif',blob:b,note:frames.length+' frames · '+mb(b.size)}]}},
+{id:'vid2gif',n:'Video to GIF',e:'🎬',c:'Image',d:'Turn a video clip into an animated GIF.',a:'video/*',m:0,hint:'Pick a short clip. Longer clips, more frames per second, and wider GIFs make bigger files. Limit: 150 frames.',
+ opts:[{k:'s',l:'Start (seconds)',t:'number',v:'0'},{k:'dur',l:'Length (seconds)',t:'number',v:'3'},{k:'fps',l:'Frames per second',t:'number',v:'10'},{k:'w',l:'Width (px)',t:'number',v:'480'}],
+ run:async(fs,o,p)=>{p('Loading video…');const E=await esm(GIFENC),v=document.createElement('video'),u=URL.createObjectURL(fs[0]);v.muted=true;v.playsInline=true;v.preload='auto';v.src=u;
+  const seek=t=>new Promise(r=>{if(Math.abs(v.currentTime-t)<.001)return r();const to=setTimeout(r,4000);v.onseeked=()=>{clearTimeout(to);r()};v.currentTime=t});
+  try{await new Promise((ok,no)=>{v.onloadedmetadata=ok;v.onerror=()=>no(new Error('Your browser cannot read this video format. Try an MP4 or WebM.'))});
+   const dur=v.duration,s=Math.max(0,+o.s||0),fps=Math.min(30,Math.max(1,+o.fps||10));
+   if(!isFinite(dur)||!v.videoWidth)throw new Error('Could not read this video.');
+   if(s>=dur)throw new Error('Start time is past the end of the video ('+dur.toFixed(1)+'s long).');
+   const len=Math.min(Math.max(.1,+o.dur||3),dur-s),n=Math.max(1,Math.floor(len*fps));
+   if(n>150)throw new Error(`That would be ${n} frames and the limit is 150. Lower the length or the frames per second.`);
+   const W=Math.max(16,Math.min(1000,Math.round(+o.w)||480)),H=Math.max(1,Math.round(v.videoHeight*W/v.videoWidth)),c=cv(W,H),x=c.getContext('2d',{willReadFrequently:true}),g=E.GIFEncoder();
+   for(let i=0;i<n;i++){p(`Frame ${i+1}/${n}…`);await seek(Math.min(s+i/fps,dur-.01));x.drawImage(v,0,0,W,H);
+    const d=x.getImageData(0,0,W,H).data,pal=E.quantize(d,256);g.writeFrame(E.applyPalette(d,pal),W,H,{palette:pal,delay:Math.max(20,Math.round(1000/fps)),repeat:0})}
+   g.finish();const b=new Blob([g.bytes()],{type:'image/gif'});return[{name:base(fs[0].name)+'.gif',blob:b,note:n+' frames · '+mb(b.size)}]}
+  finally{URL.revokeObjectURL(u)}}},
 {id:'wordcount',n:'Word Counter',e:'🔢',c:'Text',d:'Count words, characters, sentences.',text:1},
 {id:'case',n:'Case Converter',e:'🔤',c:'Text',d:'UPPER, lower, Title, Sentence.',text:2}
 ];
@@ -299,9 +314,9 @@ $('#n-tools').textContent=TOOLS.filter(t=>!t.soon).length;
 $('#q').oninput=render;
 
 /* hero converter */
-[['→ JPG','convert','jpg'],['→ PNG','convert','png'],['→ WEBP','convert','webp'],['Image → PDF','img2pdf'],['Compress','compress'],['Resize','resize'],['GIF Maker','gifmaker'],['Remove background','bgremove'],['PDF → JPG','pdf2jpg'],['OCR','ocr'],['Merge PDF','pdfmerge'],['Split PDF','pdfsplit']].forEach(([l,id,v])=>{const b=document.createElement('button');b.className='chip';b.textContent=l;b.onclick=()=>openTool(id,null,v);$('#chips').appendChild(b)});
-const hp=document.createElement('input');hp.type='file';hp.multiple=true;hp.accept='image/*,application/pdf';
-function route(fs){fs=[...fs];if(!fs.length)return;const pdfs=fs.filter(f=>f.type===PDF),imgs=fs.filter(f=>f.type.startsWith('image/'));
+[['→ JPG','convert','jpg'],['→ PNG','convert','png'],['→ WEBP','convert','webp'],['Image → PDF','img2pdf'],['Compress','compress'],['Resize','resize'],['GIF Maker','gifmaker'],['Video → GIF','vid2gif'],['Remove background','bgremove'],['PDF → JPG','pdf2jpg'],['OCR','ocr'],['Merge PDF','pdfmerge'],['Split PDF','pdfsplit']].forEach(([l,id,v])=>{const b=document.createElement('button');b.className='chip';b.textContent=l;b.onclick=()=>openTool(id,null,v);$('#chips').appendChild(b)});
+const hp=document.createElement('input');hp.type='file';hp.multiple=true;hp.accept='image/*,application/pdf,video/*';
+function route(fs){fs=[...fs];if(!fs.length)return;const pdfs=fs.filter(f=>f.type===PDF),imgs=fs.filter(f=>f.type.startsWith('image/'));const vids=fs.filter(f=>f.type.startsWith('video/'));if(vids.length&&!pdfs.length&&!imgs.length){openTool('vid2gif',vids);return}
  if(pdfs.length&&!imgs.length)openTool(pdfs.length>1?'pdfmerge':'pdfsplit',pdfs);else if(imgs.length)openTool('convert',imgs);}
 $('#hdrop').onclick=()=>hp.click();hp.onchange=()=>{route(hp.files);hp.value=''};
 $('#hdrop').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();hp.click()}};
@@ -345,7 +360,7 @@ function openTool(id,pre,val){const t=get(id);cur=t;files=pre?[...pre]:[];
  recent=[id,...recent.filter(x=>x!==id)].slice(0,6);ls.set('recent',recent);render();
  $('#d-title').textContent=t.e+' '+t.n;const B=$('#d-body');B.innerHTML='';
  if(t.text){textUI(t,B);dlg.showModal();return}
- const acc=t.a===IMG?'image':t.a===PDF?'PDF':t.a==='image/gif'?'GIF':'image or PDF';
+ const acc=t.a===IMG?'image':t.a===PDF?'PDF':t.a==='image/gif'?'GIF':t.a==='video/*'?'video':'image or PDF';
  B.innerHTML=`<div class="drop" id="td" tabindex="0" role="button"><h3>Drop ${acc} files here</h3><small>or click to choose${t.m?' (multiple allowed)':''}</small></div><div class="files" id="fl"></div><small style="color:var(--mute)">${t.hint||''}</small><div id="op" style="display:grid;gap:10px"></div><div class="row"><button class="btn p" id="run">Run</button><button class="btn" id="clr">Clear</button></div><div class="res" id="rs"></div><div class="err" id="er"></div>`;
  const op=$('#op'),vals={};
  (t.opts||[]).forEach(o=>{vals[o.k]=(id==='convert'&&o.k==='fmt'&&val)?val:o.v;const w=document.createElement('label');w.className='opt';w.innerHTML=`<span>${o.l}</span>`;let el;
@@ -364,7 +379,7 @@ function openTool(id,pre,val){const t=get(id);cur=t;files=pre?[...pre]:[];
   pu.forEach(URL.revokeObjectURL);pu=[];const fl=$('#fl');fl.textContent='';
   files.forEach((f,i)=>{const row=document.createElement('div'),th=document.createElement('div'),meta=document.createElement('div'),ac=document.createElement('div');
    row.className='fi';th.className='th';meta.className='fm';ac.className='row';meta.innerHTML='<b></b><small></small>';meta.firstChild.textContent=f.name;meta.lastChild.textContent=mb(f.size);
-   if(f.type.startsWith('image/')){const u=URL.createObjectURL(f);pu.push(u);const im=new Image();im.alt='';im.src=u;th.appendChild(im)}else{th.textContent='PDF';pdfThumb(f,th,meta.lastChild)}
+   if(f.type.startsWith('image/')){const u=URL.createObjectURL(f);pu.push(u);const im=new Image();im.alt='';im.src=u;th.appendChild(im)}else if(f.type.startsWith('video/')){const u=URL.createObjectURL(f);pu.push(u);const vd=document.createElement('video');vd.muted=true;vd.preload='metadata';vd.playsInline=true;vd.src=u+'#t=0.1';vd.onloadedmetadata=()=>{meta.lastChild.textContent+=' · '+vd.duration.toFixed(1)+'s'};th.appendChild(vd)}else{th.textContent='PDF';pdfThumb(f,th,meta.lastChild)}
    const mk=(tx,lb,fn)=>{const x=document.createElement('button');x.className='btn';x.textContent=tx;x.setAttribute('aria-label',lb);x.onclick=fn;ac.appendChild(x)};
    if(t.m&&files.length>1){if(i>0)mk('↑','Move up',()=>{[files[i-1],files[i]]=[files[i],files[i-1]];list()});if(i<files.length-1)mk('↓','Move down',()=>{[files[i+1],files[i]]=[files[i],files[i+1]];list()})}
    mk('×','Remove file',()=>{files.splice(i,1);list()});
