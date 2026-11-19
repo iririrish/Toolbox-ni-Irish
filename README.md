@@ -71,8 +71,22 @@ Offline support saves the page and its libraries in the browser's cache. If you 
 - OCR downloads language data on first use. These tools need an internet connection the first time.
 - GIF Maker and Video to GIF use [gifenc](https://github.com/mattdesl/gifenc) to build GIFs. Video to GIF reads frames with the browser's built-in video player, so it supports the formats your browser can play (usually MP4 and WebM). GIF Remove Background uses [gifuct-js](https://github.com/matt-way/gifuct-js) to read GIF frames, then gifenc to save them. Both load from jsDelivr when first used.
 - Favorites, recent tools, and theme are saved in the browser's `localStorage`.
+- Design: Retro-Futurism style (neon cyan, hot pink, and purple on deep indigo), chosen with the ui-ux-pro-max design skill. Fonts are Orbitron (headings) and Exo 2 (body), loaded from Google Fonts. Icons are inline SVG, so no icon library is needed.
 
 ## Changelog
+
+### v2.0 — Futuristic retro redesign
+- New look based on the **Retro-Futurism** style: neon cyan, hot pink, and purple on deep indigo, with an 80s sunset sun, a perspective grid floor, and soft glow on cards and buttons.
+- Dark mode now adds faint **CRT scanlines**. The main title does a short glitch when the page loads, and the status dot blinks.
+- Light mode is a daytime version of the same style: lavender background, purple accents, and hard pink shadows.
+- **Dark mode is now the default** for new visitors. If you already picked light or dark, the site remembers your choice.
+- Replaced all emoji icons with clean **SVG icons** (tools, categories, logo, theme button).
+- New fonts: **Orbitron** for headings and **Exo 2** for body text.
+- Cards in each row now have the same height. Buttons, close buttons, and chips are at least 40–44px tall for easier tapping.
+- Accessibility: pink keyboard focus ring on every control, and animation and glitch effects turn off for people who set "reduce motion".
+- New app icons and dark theme colors for the installed phone app. If you installed it before, remove it and install again to see the new icon.
+- All tools work the same as before. Nothing was removed.
+- Bumped the offline cache to v2.0.
 
 ### v1.10 — Photo Frame Maker now removes #00FF00
 - Changed **Photo Frame Maker**. It no longer looks for photo slots on its own. It now removes pure green (**#00FF00**) from the image and makes it transparent, so you can fill your frame's slots with green and get see-through slots.
