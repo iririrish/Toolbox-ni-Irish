@@ -30,7 +30,7 @@ Open the app once while online. After that:
 
 | Works offline | Needs internet the first time, then works offline |
 |---------------|--------------------------------------------------|
-| Image Compressor, Resizer, Converter, Rotator, Image to PDF, Photo Frame Maker | Background Remover (downloads an AI model on first use), GIF Maker, Video to GIF and GIF Remove Background (load small libraries on first use; the AI method also downloads the model) |
+| Image Compressor, Resizer, Converter, Rotator, Image to PDF, Photo Frame Maker, Photo Print Sheet (layout and PDF) | Background Remover and the Photo Print Sheet's background removal (download an AI model on first use), GIF Maker, Video to GIF and GIF Remove Background (load small libraries on first use; the AI method also downloads the model) |
 | PDF Merger, Splitter, Page Rotator, PDF Scanner | OCR (downloads engine and language data on first use) |
 | PDF to JPG/PNG, PDF to Text, previews | |
 | Word Counter, Case Converter | |
@@ -43,7 +43,7 @@ Offline support saves the page and its libraries in the browser's cache. If you 
 
 | Category | Tools |
 |----------|-------|
-| Image | Image Compressor, Image Resizer, Image Converter (PNG/JPG/WEBP), Image Rotator and Flipper, Image to PDF, Background Remover, GIF Maker, GIF Remove Background, Video to GIF, Photo Frame Maker |
+| Image | Image Compressor, Image Resizer, Image Converter (PNG/JPG/WEBP), Image Rotator and Flipper, Image to PDF, Background Remover, GIF Maker, GIF Remove Background, Video to GIF, Photo Frame Maker, Photo Print Sheet |
 | PDF | PDF Merger, PDF Splitter / Page Extractor, PDF Page Rotator, PDF to JPG/PNG, PDF to Text, PDF Scanner |
 | Text | Word Counter, Case Converter, OCR (image or scanned PDF to text) |
 
@@ -74,6 +74,19 @@ Offline support saves the page and its libraries in the browser's cache. If you 
 - Design: Retro-Futurism style (neon cyan, hot pink, and purple on deep indigo), chosen with the ui-ux-pro-max design skill. Fonts are Orbitron (headings) and Exo 2 (body), loaded from Google Fonts. Icons are inline SVG, so no icon library is needed.
 
 ## Changelog
+
+### v2.1 — Photo Print Sheet (1x1 / ID photos to PDF)
+- Added **Photo Print Sheet**, a step-by-step tool for printing photos on a sheet of paper.
+  1. **Upload a photo.** The background is removed with AI and replaced with white (you can turn this off). You see the original next to the print version, and can replace the photo at any time.
+  2. **Photo size.** Presets: 1 x 1 inch, 2 x 2 inches, Passport (35 x 45 mm), 2R, 3R, 4R, or type your own width and height in inches or centimeters. The size is always shown in both inches and centimeters. Fit mode crops to fill the frame without stretching, or shows the whole photo. Zoom and move sliders let you choose the framing.
+  3. **Paper size.** A4, A5, Letter, Legal, Long bond (8.5 x 13 in), or a custom size. Portrait, landscape, or auto (picks whichever fits more photos). Adjustable margin and spacing, and photos can be centered or start at the top.
+  4. **Copies.** "Fill the page" fits as many as possible, or set the exact number. If you ask for more than one sheet holds, it makes extra sheets.
+  5. **Print options.** Trim guides (none, a border around each photo, or cut lines), lossless PNG or smaller JPEG, and 300 or 600 DPI.
+  6. **Download a PDF.** The page and the photos are in real physical size. Print at "Actual size" or 100%.
+- A live preview of the whole sheet updates as you change any setting. It shows photos per row and per column, the total copies, and the number of sheets.
+- Tested: a 2 x 2 inch photo, 9 copies on A4 came out as nine 50.8 mm squares, centered, with 2.54 mm spacing, on a 210 x 297 mm page.
+- Background removal needs internet the first time (it downloads the AI model). If it fails, a "Use original background" button lets you continue. The layout, preview, and PDF work offline.
+- Added a Photo print chip to the top card. Bumped the offline cache to v2.1. No other tools were changed.
 
 ### v2.0 — Futuristic retro redesign
 - New look based on the **Retro-Futurism** style: neon cyan, hot pink, and purple on deep indigo, with an 80s sunset sun, a perspective grid floor, and soft glow on cards and buttons.
