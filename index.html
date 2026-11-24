@@ -175,6 +175,26 @@ footer{font-family:ui-monospace,Consolas,monospace;letter-spacing:.04em}footer::
 @media(max-width:820px){.hero::before{display:none}}
 @media(max-width:480px){.logo{font-size:14px}.logo b{display:none}.nav{gap:8px}#inst{padding:8px 10px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}h1{filter:none}}
+
+/* ===== v2.1 Photo Print Sheet ===== */
+dialog.wide{width:min(1180px,96vw)}
+.pp [hidden]{display:none!important}
+.pp{display:grid;grid-template-columns:minmax(0,440px) minmax(0,1fr);gap:22px;align-items:start}
+.pp-col{display:grid;gap:16px;min-width:0}
+.pp-s{border:1px solid var(--line);border-radius:6px;padding:16px;display:grid;gap:12px;background:var(--bg)}
+.pp-s h4{margin:0;display:flex;align-items:center;gap:10px;font:700 15px Orbitron,system-ui,sans-serif;text-transform:uppercase;letter-spacing:.05em}
+.pp-s h4 i{display:grid;place-items:center;width:28px;height:28px;border-radius:4px;background:var(--acc);color:var(--bg);font-style:normal}
+.pp .opt{grid-template-columns:120px 1fr}.pp-two{display:flex;align-items:center;gap:8px}.pp-two input{min-width:0}.pp-two em{font-style:normal;color:var(--mute);font-size:14px}
+.pp-dim{font-size:14px;color:var(--mute)}.pp-dim b{color:var(--ink)}
+.pp-ck{display:flex;align-items:center;gap:10px;font-size:15px;min-height:44px;cursor:pointer}.pp-ck input{width:20px;height:20px;accent-color:var(--pk)}
+.pp-thumbs{display:flex;gap:12px}.pp-thumbs figure{margin:0;flex:1;min-width:0;text-align:center;border:1px solid var(--line);border-radius:6px;padding:6px;background:var(--card)}
+.pp-thumbs img,.pp-thumbs canvas{display:block;max-width:100%;max-height:150px;margin:0 auto;object-fit:contain}
+.pp-st{min-height:20px;font-size:14px;color:var(--mute)}
+.pp-pv{position:sticky;top:0;display:grid;gap:10px;min-width:0}
+.pp-info{font-size:15px;line-height:1.5}.pp-info b{color:var(--acc)}
+.pp-cvwrap{display:grid;place-items:center;padding:14px;background:var(--bg);border:1px solid var(--line);border-radius:6px}
+.pp-cvwrap canvas{box-shadow:0 4px 18px #0006;background:#fff;max-width:100%}
+@media(max-width:900px){.pp{grid-template-columns:1fr}.pp-pv{position:static;order:-1}.pp .opt{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -236,8 +256,8 @@ footer{font-family:ui-monospace,Consolas,monospace;letter-spacing:.04em}footer::
 </dialog>
 <script>
 const $=s=>document.querySelector(s);
-const P={file:'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6',image:'M3 3h18v18H3zM8.5 10a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3M21 15l-5-5L5 21',layers:'M12 2l10 5-10 5L2 7zM2 17l10 5 10-5M2 12l10 5 10-5',cut:'M6 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6M6 21a3 3 0 1 0 0-6 3 3 0 0 0 0 6M20 4L8.1 15.9M14.5 14.5L20 20M8.1 8.1L12 12',rot:'M21 12a9 9 0 1 1-3-6.7L21 8M21 3v5h-5',type:'M4 7V4h16v3M9 20h6M12 4v16',scan:'M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M7 12h10',find:'M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16M21 21l-4.3-4.3',film:'M2 2h20v20H2zM7 2v20M17 2v20M2 12h20M2 7h5M2 17h5M17 17h5M17 7h5',wand:'M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9zM19 16l.7 1.8 1.8.7-1.8.7L19 21l-.7-1.8-1.8-.7 1.8-.7z',play:'M5 3l14 9-14 9z',frame:'M3 3h18v18H3zM8 8h8v8H8z',hash:'M4 9h16M4 15h16M10 3L8 21M16 3l-2 18',min:'M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7',max:'M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7',rep:'M17 1l4 4-4 4M3 11V9a4 4 0 0 1 4-4h14M7 23l-4-4 4-4M21 13v2a4 4 0 0 1-4 4H3',clock:'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20M12 6v6l4 2',moon:'M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z',sun:'M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10M12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4'};
-const IC={compress:'min',resize:'max',convert:'rep',rotate:'rot',img2pdf:'file',pdfmerge:'layers',pdfsplit:'cut',pdfrotate:'rot',bgremove:'wand',pdf2jpg:'image',pdf2text:'type',scanner:'scan',ocr:'find',gifmaker:'play',gifbg:'wand',vid2gif:'film',frame:'frame',wordcount:'hash',case:'type'};
+const P={print:'M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v8H6z',file:'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6',image:'M3 3h18v18H3zM8.5 10a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3M21 15l-5-5L5 21',layers:'M12 2l10 5-10 5L2 7zM2 17l10 5 10-5M2 12l10 5 10-5',cut:'M6 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6M6 21a3 3 0 1 0 0-6 3 3 0 0 0 0 6M20 4L8.1 15.9M14.5 14.5L20 20M8.1 8.1L12 12',rot:'M21 12a9 9 0 1 1-3-6.7L21 8M21 3v5h-5',type:'M4 7V4h16v3M9 20h6M12 4v16',scan:'M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M7 12h10',find:'M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16M21 21l-4.3-4.3',film:'M2 2h20v20H2zM7 2v20M17 2v20M2 12h20M2 7h5M2 17h5M17 17h5M17 7h5',wand:'M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9zM19 16l.7 1.8 1.8.7-1.8.7L19 21l-.7-1.8-1.8-.7 1.8-.7z',play:'M5 3l14 9-14 9z',frame:'M3 3h18v18H3zM8 8h8v8H8z',hash:'M4 9h16M4 15h16M10 3L8 21M16 3l-2 18',min:'M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7',max:'M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7',rep:'M17 1l4 4-4 4M3 11V9a4 4 0 0 1 4-4h14M7 23l-4-4 4-4M21 13v2a4 4 0 0 1-4 4H3',clock:'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20M12 6v6l4 2',moon:'M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z',sun:'M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10M12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4'};
+const IC={photoprint:'print',compress:'min',resize:'max',convert:'rep',rotate:'rot',img2pdf:'file',pdfmerge:'layers',pdfsplit:'cut',pdfrotate:'rot',bgremove:'wand',pdf2jpg:'image',pdf2text:'type',scanner:'scan',ocr:'find',gifmaker:'play',gifbg:'wand',vid2gif:'film',frame:'frame',wordcount:'hash',case:'type'};
 function ico(k){const n=typeof k==='string'?k:(k.soon?'clock':IC[k.id]||'file');return`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${(P[n]||P.file).split('M').filter(Boolean).map(d=>`<path d="M${d}"/>`).join('')}</svg>`}
 
 const ls={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
@@ -372,6 +392,7 @@ const TOOLS=[
   const im=await loadImg(fs[n]),W=im.naturalWidth,H=im.naturalHeight,c=cv(W,H),x=c.getContext('2d',{willReadFrequently:true});x.drawImage(im,0,0);const id=x.getImageData(0,0,W,H),cnt=chromaKey(id.data,W,H,key,(+o.tol/100)*441,Math.max(0,Math.min(10,Math.round(+o.grow)||0)));
   if(!cnt)throw new Error('No '+o.cc.toUpperCase()+' found in '+fs[n].name+'. Try raising Tolerance or check the color.');
   x.putImageData(id,0,0);out.push({name:base(fs[n].name)+'-frame.png',blob:await toBlob(c,'image/png'),note:Math.round(cnt/(W*H)*100)+'% of the image made transparent'})}return out}},
+{id:'photoprint',n:'Photo Print Sheet',e:'🖨️',c:'Image',d:'ID photos on a sheet: pick the photo size, paper and copies, then save a print-ready PDF.',a:IMG,wide:1,custom:photoUI},
 {id:'wordcount',n:'Word Counter',e:'🔢',c:'Text',d:'Count words, characters, sentences.',text:1},
 {id:'case',n:'Case Converter',e:'🔤',c:'Text',d:'UPPER, lower, Title, Sentence.',text:2}
 ];
@@ -401,7 +422,7 @@ $('#n-tools').textContent=TOOLS.filter(t=>!t.soon).length;
 $('#q').oninput=render;
 
 /* hero converter */
-[['→ JPG','convert','jpg'],['→ PNG','convert','png'],['→ WEBP','convert','webp'],['Image → PDF','img2pdf'],['Compress','compress'],['Resize','resize'],['GIF Maker','gifmaker'],['Video → GIF','vid2gif'],['Remove background','bgremove'],['PDF → JPG','pdf2jpg'],['OCR','ocr'],['Merge PDF','pdfmerge'],['Split PDF','pdfsplit']].forEach(([l,id,v])=>{const b=document.createElement('button');b.className='chip';b.textContent=l;b.onclick=()=>openTool(id,null,v);$('#chips').appendChild(b)});
+[['→ JPG','convert','jpg'],['→ PNG','convert','png'],['→ WEBP','convert','webp'],['Image → PDF','img2pdf'],['Compress','compress'],['Resize','resize'],['GIF Maker','gifmaker'],['Photo print','photoprint'],['Video → GIF','vid2gif'],['Remove background','bgremove'],['PDF → JPG','pdf2jpg'],['OCR','ocr'],['Merge PDF','pdfmerge'],['Split PDF','pdfsplit']].forEach(([l,id,v])=>{const b=document.createElement('button');b.className='chip';b.textContent=l;b.onclick=()=>openTool(id,null,v);$('#chips').appendChild(b)});
 const hp=document.createElement('input');hp.type='file';hp.multiple=true;hp.accept='image/*,application/pdf,video/*';
 function route(fs){fs=[...fs];if(!fs.length)return;const pdfs=fs.filter(f=>f.type===PDF),imgs=fs.filter(f=>f.type.startsWith('image/'));const vids=fs.filter(f=>f.type.startsWith('video/'));if(vids.length&&!pdfs.length&&!imgs.length){openTool('vid2gif',vids);return}
  if(pdfs.length&&!imgs.length)openTool(pdfs.length>1?'pdfmerge':'pdfsplit',pdfs);else if(imgs.length)openTool('convert',imgs);}
@@ -446,6 +467,7 @@ const dlg=$('#dlg'),kdlg=$('#kdlg');let cur=null,files=[],urls=[],pu=[];
 function openTool(id,pre,val){const t=get(id);cur=t;files=pre?[...pre]:[];
  recent=[id,...recent.filter(x=>x!==id)].slice(0,6);ls.set('recent',recent);render();
  const dt=$('#d-title');dt.innerHTML=ico(t);dt.append(' '+t.n);const B=$('#d-body');B.innerHTML='';
+ dlg.classList.toggle('wide',!!t.wide);if(t.custom){window.runCur=null;t.custom(B);dlg.showModal();return}
  if(t.text){textUI(t,B);dlg.showModal();return}
  const acc=t.a===IMG?'image':t.a===PDF?'PDF':t.a==='image/gif'?'GIF':t.a==='video/*'?'video':'image or PDF';
  B.innerHTML=`<div class="drop" id="td" tabindex="0" role="button"><h3>Drop ${acc} files here</h3><small>or click to choose${t.m?' (multiple allowed)':''}</small></div><div class="files" id="fl"></div><small style="color:var(--mute)">${t.hint||''}</small><div id="op" style="display:grid;gap:10px"></div><div class="row"><button class="btn p" id="run">Run</button><button class="btn" id="clr">Clear</button></div><div class="res" id="rs"></div><div class="err" id="er"></div>`;
@@ -481,6 +503,106 @@ function openTool(id,pre,val){const t=get(id);cur=t;files=pre?[...pre]:[];
   catch(e){er.textContent='Could not process: '+(e.message||'file may be corrupted or password-protected.')}
   btn.disabled=false;btn.textContent='Run'};
  list();dlg.showModal()}
+
+const PHS={'1x1':['1 × 1 inch',25.4,25.4],'2x2':['2 × 2 inches',50.8,50.8],'pass':['Passport (35 × 45 mm)',35,45],'2r':['2R (2.5 × 3.5 in)',63.5,88.9],'3r':['3R (3.5 × 5 in)',88.9,127],'4r':['4R (4 × 6 in)',101.6,152.4],'custom':['Custom size',0,0]};
+const PAP={a4:['A4',210,297],a5:['A5',148,210],letter:['Letter',215.9,279.4],legal:['Legal',215.9,355.6],long:['Long bond (8.5 × 13 in)',215.9,330.2],custom:['Custom paper',0,0]};
+const dimTxt=(w,h)=>`${(w/25.4).toFixed(2)} × ${(h/25.4).toFixed(2)} in · ${(w/10).toFixed(2)} × ${(h/10).toFixed(2)} cm`;
+function photoUI(B){
+ const opts=o=>Object.entries(o).map(([k,v])=>`<option value="${k}">${v[0]}</option>`).join('');
+ const rowN=(id,l,lab)=>`<div class="opt"><span>${l}</span><div class="pp-two"><input type="number" id="pp-${id}" step="any" min="0" aria-label="${lab}"><em class="ul"></em></div></div>`;
+ B.innerHTML=`<div class="pp" id="pp"><div class="pp-col">
+<section class="pp-s"><h4><i>1</i>Upload photo</h4>
+<div class="drop" id="pp-drop" tabindex="0" role="button" aria-label="Choose a photo"><h3>Drop a photo here</h3><small>or click to choose one</small></div>
+<label class="pp-ck"><input type="checkbox" id="pp-bg" checked><span>Remove the background and make it white</span></label>
+<div class="pp-thumbs" id="pp-th" hidden><figure><img id="pp-o" alt="Original photo"><figcaption>Original</figcaption></figure><figure><canvas id="pp-p"></canvas><figcaption>For printing</figcaption></figure></div>
+<div class="pp-st" id="pp-status" role="status"></div>
+<div class="row"><button class="btn" id="pp-rep" hidden>Replace photo</button><button class="btn" id="pp-orig" hidden>Use original background</button></div></section>
+<section class="pp-s"><h4><i>2</i>Photo size</h4>
+<label class="opt"><span>Preset</span><select id="pp-ps">${opts(PHS)}</select></label>
+<label class="opt"><span>Units</span><select id="pp-u"><option value="in">Inches</option><option value="cm">Centimeters</option></select></label>
+<div class="opt"><span>Width × Height</span><div class="pp-two"><input type="number" id="pp-w" step="any" min="0" aria-label="Photo width"><b>×</b><input type="number" id="pp-h" step="any" min="0" aria-label="Photo height"><em class="ul"></em></div></div>
+<div class="pp-dim" id="pp-pd"></div>
+<label class="opt"><span>Fit</span><select id="pp-fit"><option value="fill">Fill the frame (crop edges)</option><option value="fit">Show the whole photo</option></select></label>
+<label class="opt"><span>Zoom</span><input type="range" id="pp-z" min="50" max="300" value="100"></label>
+<label class="opt"><span>Left / right</span><input type="range" id="pp-px" min="-100" max="100" value="0"></label>
+<label class="opt"><span>Up / down</span><input type="range" id="pp-py" min="-100" max="100" value="0"></label></section>
+<section class="pp-s"><h4><i>3</i>Paper size</h4>
+<label class="opt"><span>Paper</span><select id="pp-pp">${opts(PAP)}</select></label>
+<div class="opt"><span>Width × Height</span><div class="pp-two"><input type="number" id="pp-pw" step="any" min="0" aria-label="Paper width"><b>×</b><input type="number" id="pp-ph" step="any" min="0" aria-label="Paper height"><em class="ul"></em></div></div>
+<div class="pp-dim" id="pp-pad"></div>
+<label class="opt"><span>Orientation</span><select id="pp-or"><option value="auto">Auto (fits the most photos)</option><option value="portrait">Portrait</option><option value="landscape">Landscape</option></select></label>
+${rowN('m','Margin','Page margin')}${rowN('g','Spacing','Space between photos')}
+<label class="opt"><span>Position</span><select id="pp-al"><option value="center">Centered on the page</option><option value="top">Start at the top</option></select></label></section>
+<section class="pp-s"><h4><i>4</i>Number of copies</h4>
+<label class="pp-ck"><input type="checkbox" id="pp-auto" checked><span>Fill the page (as many as fit)</span></label>
+<label class="opt"><span>Copies</span><input type="number" id="pp-n" min="1" max="500" value="1"></label>
+<div class="pp-dim" id="pp-sum"></div></section>
+<section class="pp-s"><h4><i>5</i>Print options</h4>
+<label class="opt"><span>Trim guides</span><select id="pp-cut"><option value="none">None</option><option value="border">Border around each photo</option><option value="lines">Cut lines</option></select></label>
+<label class="opt"><span>Quality</span><select id="pp-fmt"><option value="png">Lossless (PNG)</option><option value="jpg">Smaller file (JPEG 95%)</option></select></label>
+<label class="opt"><span>Resolution</span><select id="pp-dpi"><option value="300">300 DPI</option><option value="600">600 DPI</option></select></label></section>
+<section class="pp-s"><h4><i>6</i>Download</h4><button class="btn p" id="pp-dl" disabled>Download PDF</button><div class="pp-st" id="pp-msg" role="status">Upload a photo to enable the download. When you print, choose "Actual size" or 100%.</div></section>
+</div><aside class="pp-pv"><div class="pp-info" id="pp-info"></div><div class="pp-cvwrap" id="pp-wrap"><canvas id="pp-cv" aria-label="Print preview"></canvas></div><div class="row" id="pp-pg" hidden><button class="btn" id="pp-prev">Previous sheet</button><span id="pp-pn"></span><button class="btn" id="pp-next">Next sheet</button></div></aside></div>`;
+ const root=B.querySelector('#pp'),g=id=>root.querySelector('#pp-'+id);
+ const st={w:25.4,h:25.4,pw:210,ph:297,m:6.35,g:2.54,u:'in',page:0,img:null,id:0,file:null,job:0,orig:null,fit:'fill',z:100,px:0,py:0,or:'auto',al:'center',auto:true,n:1,cut:'none',fmt:'png',dpi:300};
+ const U=()=>st.u==='in'?25.4:10,shw=mm=>+(mm/U()).toFixed(3),pos=(el,old)=>{const v=parseFloat(el.value);return v>0?v*U():old};
+ const read=()=>{st.w=pos(g('w'),st.w);st.h=pos(g('h'),st.h);st.pw=pos(g('pw'),st.pw);st.ph=pos(g('ph'),st.ph);const m=parseFloat(g('m').value),gp=parseFloat(g('g').value);if(m>=0)st.m=m*U();if(gp>=0)st.g=gp*U();st.fit=g('fit').value;st.z=+g('z').value;st.px=+g('px').value;st.py=+g('py').value;st.or=g('or').value;st.al=g('al').value;st.auto=g('auto').checked;st.n=Math.max(1,Math.min(500,parseInt(g('n').value)||1));st.cut=g('cut').value;st.fmt=g('fmt').value;st.dpi=+g('dpi').value};
+ const fill=()=>{g('w').value=shw(st.w);g('h').value=shw(st.h);g('pw').value=shw(st.pw);g('ph').value=shw(st.ph);g('m').value=shw(st.m);g('g').value=shw(st.g);root.querySelectorAll('.ul').forEach(e=>{e.textContent=st.u})};
+ const calc=()=>{const b=(W,H)=>({W,H,cols:Math.max(0,Math.floor((W-2*st.m+st.g+1e-6)/(st.w+st.g))),rows:Math.max(0,Math.floor((H-2*st.m+st.g+1e-6)/(st.h+st.g)))});const lo=Math.min(st.pw,st.ph),hi=Math.max(st.pw,st.ph),a=b(lo,hi),l=b(hi,lo),L=st.or==='landscape'?l:st.or==='portrait'?a:(l.cols*l.rows>a.cols*a.rows?l:a);L.cap=L.cols*L.rows;return L};
+ const total=L=>st.auto?L.cap:st.n;
+ const place=(L,cnt)=>{const rows=Math.ceil(cnt/L.cols),bh=rows*st.h+(rows-1)*st.g,y0=st.al==='top'?st.m:(L.H-bh)/2,o=[];for(let r=0;r<rows;r++){const k=Math.min(L.cols,cnt-r*L.cols),bw=k*st.w+(k-1)*st.g,x0=(L.W-bw)/2;for(let c=0;c<k;c++)o.push([x0+c*(st.w+st.g),y0+r*(st.h+st.g)])}return o};
+ const guides=(pts,L)=>{const X=new Set(),Y=new Set();pts.forEach(([x,y])=>{X.add(+x.toFixed(3));X.add(+(x+st.w).toFixed(3));Y.add(+y.toFixed(3));Y.add(+(y+st.h).toFixed(3))});const xs=[...X],ys=[...Y],e=3;return{xs,ys,x0:Math.max(0,Math.min(...xs)-e),x1:Math.min(L.W,Math.max(...xs)+e),y0:Math.max(0,Math.min(...ys)-e),y1:Math.min(L.H,Math.max(...ys)+e)}};
+ const cell=(w,h)=>{const k=[w,h,st.fit,st.z,st.px,st.py,st.id].join();if(cell.k===k)return cell.c;const c=cv(w,h),x=c.getContext('2d'),i=st.img;x.imageSmoothingQuality='high';x.fillStyle='#fff';x.fillRect(0,0,w,h);
+  if(i){const s=(st.fit==='fill'?Math.max(w/i.width,h/i.height):Math.min(w/i.width,h/i.height))*st.z/100,dw=i.width*s,dh=i.height*s,rx=Math.max(0,(dw-w)/2),ry=Math.max(0,(dh-h)/2);x.drawImage(i,(w-dw)/2-st.px/100*rx,(h-dh)/2-st.py/100*ry,dw,dh)}
+  else{x.fillStyle='#eceaf7';x.fillRect(0,0,w,h);x.fillStyle='#c4c0dd';x.beginPath();x.arc(w/2,h*.38,Math.min(w,h)*.17,0,7);x.fill();x.beginPath();x.ellipse(w/2,h,Math.min(w,h)*.34,h*.36,0,Math.PI,0);x.fill()}
+  cell.k=k;cell.c=c;return c};
+ const draw=()=>{const L=calc(),n=L.cap?total(L):0,pages=L.cap?Math.ceil(n/L.cap):0;st.page=Math.max(0,Math.min(st.page,Math.max(0,pages-1)));
+  g('n').disabled=st.auto;g('pd').innerHTML=`Photo: <b>${dimTxt(st.w,st.h)}</b>`;g('pad').innerHTML=`Paper: <b>${dimTxt(st.pw,st.ph)}</b>`;
+  g('info').innerHTML=L.cap?`<b>${L.cols}</b> per row × <b>${L.rows}</b> per column = <b>${L.cap}</b> per sheet<br><b>${n}</b> ${n===1?'copy':'copies'} on <b>${pages}</b> ${pages===1?'sheet':'sheets'} · ${L.W<L.H?'portrait':'landscape'} · ${dimTxt(L.W,L.H)}`:`<b>This photo is bigger than the printable area.</b><br>Choose a smaller photo, bigger paper, or smaller margins.`;
+  g('sum').innerHTML=L.cap?(st.auto?`The page holds <b>${L.cap}</b> photos (${L.cols} × ${L.rows}).`:`<b>${n}</b> photos: ${pages>1?`needs ${pages} sheets (${L.cap} fit on each).`:`a sheet holds up to ${L.cap}.`}`):'No photos fit with these settings.';
+  g('pg').hidden=pages<2;g('pn').textContent=`Sheet ${st.page+1} of ${pages}`;g('dl').disabled=!(st.img&&L.cap);
+  const wrap=g('wrap'),aw=Math.max(200,wrap.clientWidth-28),s=Math.min(aw/L.W,640/L.H),dpr=Math.min(devicePixelRatio||1,2),cw=Math.round(L.W*s),ch=Math.round(L.H*s),c=g('cv');
+  c.style.width=cw+'px';c.style.height=ch+'px';c.width=Math.round(cw*dpr);c.height=Math.round(ch*dpr);const x=c.getContext('2d');x.scale(dpr,dpr);x.fillStyle='#fff';x.fillRect(0,0,cw,ch);
+  x.strokeStyle='#8ab4ff';x.lineWidth=1;x.setLineDash([4,3]);x.strokeRect(st.m*s,st.m*s,cw-2*st.m*s,ch-2*st.m*s);x.setLineDash([]);
+  if(!L.cap)return;const cnt=Math.min(L.cap,n-st.page*L.cap),pts=place(L,cnt),cl=cell(Math.max(1,Math.round(st.w*s*dpr)),Math.max(1,Math.round(st.h*s*dpr)));
+  if(st.cut==='lines'){const q=guides(pts,L);x.strokeStyle='#8a8a8a';x.lineWidth=1;x.beginPath();q.xs.forEach(v=>{x.moveTo(v*s,q.y0*s);x.lineTo(v*s,q.y1*s)});q.ys.forEach(v=>{x.moveTo(q.x0*s,v*s);x.lineTo(q.x1*s,v*s)});x.stroke()}
+  pts.forEach(([px,py])=>x.drawImage(cl,px*s,py*s,st.w*s,st.h*s));
+  if(st.cut==='border'){x.strokeStyle='#555';x.lineWidth=1;pts.forEach(([px,py])=>x.strokeRect(px*s,py*s,st.w*s,st.h*s))}};
+ const flat=src=>{const w0=src.naturalWidth||src.width,h0=src.naturalHeight||src.height,k=Math.min(1,4096/Math.max(w0,h0)),c=cv(Math.round(w0*k),Math.round(h0*k)),x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.imageSmoothingQuality='high';x.drawImage(src,0,0,c.width,c.height);return c};
+ const status=t=>{g('status').textContent=t};
+ const setImg=c=>{st.img=c;st.id++;const t=g('p'),k=c?Math.min(1,300/Math.max(c.width,c.height)):1;t.width=c?Math.round(c.width*k):10;t.height=c?Math.round(c.height*k):10;const tx=t.getContext('2d');tx.clearRect(0,0,t.width,t.height);if(c)tx.drawImage(c,0,0,t.width,t.height);draw()};
+ async function proc(){if(!st.file)return;const my=++st.job;g('orig').hidden=true;status('Reading the photo…');let im;
+  try{im=await loadImg(st.file)}catch(e){status('That file could not be opened as an image.');return}
+  if(my!==st.job)return;
+  if(g('bg').checked){try{status('Loading the background remover…');const m=await esm(IMGLY);status('Removing the background…');
+    const out=await m.removeBackground(st.file,{output:{format:'image/png'},progress:(k,a,b)=>{if(my===st.job)status(String(k).startsWith('fetch')&&b?'Downloading the AI model '+Math.round(a/b*100)+'%':'Removing the background…')}});
+    if(my!==st.job)return;setImg(flat(await loadImg(out)));status('Done. The background is now white. Check the photo above, then continue.')}
+   catch(e){if(my!==st.job)return;st.orig=flat(im);setImg(null);g('orig').hidden=false;status('The background could not be removed (the AI tool needs internet the first time). You can use the original photo instead.')}}
+  else{setImg(flat(im));status('Using your original photo.')}}
+ function setFile(f){if(!f||!f.type.startsWith('image/'))return;st.file=f;g('o').src=URL.createObjectURL(f);g('th').hidden=false;g('rep').hidden=false;g('drop').querySelector('h3').textContent=f.name;setImg(null);proc()}
+ const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.onchange=()=>{setFile(inp.files[0]);inp.value=''};
+ const dz=g('drop');dz.onclick=()=>inp.click();dz.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();inp.click()}};
+ ['dragover','dragenter'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add('over')}));['dragleave','drop'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.remove('over')}));dz.addEventListener('drop',e=>setFile(e.dataTransfer.files[0]));
+ g('rep').onclick=()=>inp.click();g('orig').onclick=()=>{setImg(st.orig);g('orig').hidden=true;status('Using your original photo.')};
+ g('prev').onclick=()=>{st.page--;draw()};g('next').onclick=()=>{st.page++;draw()};
+ root.addEventListener('input',e=>{const id=e.target.id;if(id==='pp-w'||id==='pp-h')g('ps').value='custom';if(id==='pp-pw'||id==='pp-ph')g('pp').value='custom';read();draw()});
+ root.addEventListener('change',e=>{const id=e.target.id,v=e.target.value;
+  if(id==='pp-ps'&&PHS[v][1]){st.w=PHS[v][1];st.h=PHS[v][2];fill()}
+  else if(id==='pp-pp'&&PAP[v][1]){st.pw=PAP[v][1];st.ph=PAP[v][2];fill()}
+  else if(id==='pp-u'){read();st.u=v;fill()}
+  else if(id==='pp-bg'){proc()}
+  read();draw()});
+ g('dl').onclick=async()=>{const L=calc(),n=total(L);if(!st.img||!L.cap)return;const btn=g('dl'),old=btn.textContent;btn.disabled=true;btn.textContent='Building the PDF…';g('msg').textContent='';await tick();
+  try{const{jsPDF}=window.jspdf,lo=Math.min(L.W,L.H),hi=Math.max(L.W,L.H),or=L.W>L.H?'l':'p',doc=new jsPDF({unit:'mm',format:[lo,hi],orientation:or,compress:true}),pages=Math.ceil(n/L.cap),png=st.fmt==='png',cl=cell(Math.round(st.w/25.4*st.dpi),Math.round(st.h/25.4*st.dpi)),data=png?cl.toDataURL('image/png'):cl.toDataURL('image/jpeg',.95);
+   for(let p=0;p<pages;p++){if(p)doc.addPage([lo,hi],or);const pts=place(L,Math.min(L.cap,n-p*L.cap));
+    if(st.cut==='lines'){const q=guides(pts,L);doc.setDrawColor(140);doc.setLineWidth(.15);q.xs.forEach(v=>doc.line(v,q.y0,v,q.y1));q.ys.forEach(v=>doc.line(q.x0,v,q.x1,v))}
+    pts.forEach(([x,y])=>doc.addImage(data,png?'PNG':'JPEG',x,y,st.w,st.h,'photo','FAST'));
+    if(st.cut==='border'){doc.setDrawColor(90);doc.setLineWidth(.15);pts.forEach(([x,y])=>doc.rect(x,y,st.w,st.h))}}
+   doc.save(`photo-sheet-${+(st.w/25.4).toFixed(2)}x${+(st.h/25.4).toFixed(2)}in-${n}-copies.pdf`);g('msg').textContent='Saved. When you print, choose "Actual size" or 100% (not "Fit to page").'}
+  catch(e){g('msg').textContent='Could not build the PDF: '+(e.message||e)}
+  btn.textContent=old;draw()};
+ let lw=0;new ResizeObserver(()=>{const w=g('wrap').clientWidth;if(w!==lw){lw=w;draw()}}).observe(g('wrap'));
+ fill();draw()}
 function textUI(t,B){window.runCur=null;
  B.innerHTML=`<textarea id="tx" placeholder="Type or paste text…"></textarea>`+(t.text===1?`<div class="cnt"><div><b id="c1">0</b><span>Words</span></div><div><b id="c2">0</b><span>Characters</span></div><div><b id="c3">0</b><span>Sentences</span></div><div><b id="c4">0</b><span>Min to read</span></div></div>`:`<div class="row"><button class="btn" data-c="u">UPPER</button><button class="btn" data-c="l">lower</button><button class="btn" data-c="t">Title Case</button><button class="btn" data-c="s">Sentence case</button><button class="btn" id="cp">Copy</button></div>`);
  const tx=$('#tx');
