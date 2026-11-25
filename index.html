@@ -195,6 +195,10 @@ dialog.wide{width:min(1180px,96vw)}
 .pp-cvwrap{display:grid;place-items:center;padding:14px;background:var(--bg);border:1px solid var(--line);border-radius:6px}
 .pp-cvwrap canvas{box-shadow:0 4px 18px #0006;background:#fff;max-width:100%}
 @media(max-width:900px){.pp{grid-template-columns:1fr}.pp-pv{position:static;order:-1}.pp .opt{grid-template-columns:1fr}}
+
+/* ===== v2.2 Link Shortener ===== */
+dialog [hidden]{display:none!important}
+.r>span{min-width:0;overflow-wrap:anywhere}
 </style>
 </head>
 <body>
@@ -256,8 +260,8 @@ dialog.wide{width:min(1180px,96vw)}
 </dialog>
 <script>
 const $=s=>document.querySelector(s);
-const P={print:'M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v8H6z',file:'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6',image:'M3 3h18v18H3zM8.5 10a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3M21 15l-5-5L5 21',layers:'M12 2l10 5-10 5L2 7zM2 17l10 5 10-5M2 12l10 5 10-5',cut:'M6 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6M6 21a3 3 0 1 0 0-6 3 3 0 0 0 0 6M20 4L8.1 15.9M14.5 14.5L20 20M8.1 8.1L12 12',rot:'M21 12a9 9 0 1 1-3-6.7L21 8M21 3v5h-5',type:'M4 7V4h16v3M9 20h6M12 4v16',scan:'M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M7 12h10',find:'M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16M21 21l-4.3-4.3',film:'M2 2h20v20H2zM7 2v20M17 2v20M2 12h20M2 7h5M2 17h5M17 17h5M17 7h5',wand:'M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9zM19 16l.7 1.8 1.8.7-1.8.7L19 21l-.7-1.8-1.8-.7 1.8-.7z',play:'M5 3l14 9-14 9z',frame:'M3 3h18v18H3zM8 8h8v8H8z',hash:'M4 9h16M4 15h16M10 3L8 21M16 3l-2 18',min:'M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7',max:'M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7',rep:'M17 1l4 4-4 4M3 11V9a4 4 0 0 1 4-4h14M7 23l-4-4 4-4M21 13v2a4 4 0 0 1-4 4H3',clock:'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20M12 6v6l4 2',moon:'M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z',sun:'M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10M12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4'};
-const IC={photoprint:'print',compress:'min',resize:'max',convert:'rep',rotate:'rot',img2pdf:'file',pdfmerge:'layers',pdfsplit:'cut',pdfrotate:'rot',bgremove:'wand',pdf2jpg:'image',pdf2text:'type',scanner:'scan',ocr:'find',gifmaker:'play',gifbg:'wand',vid2gif:'film',frame:'frame',wordcount:'hash',case:'type'};
+const P={link:'M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7',print:'M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v8H6z',file:'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6',image:'M3 3h18v18H3zM8.5 10a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3M21 15l-5-5L5 21',layers:'M12 2l10 5-10 5L2 7zM2 17l10 5 10-5M2 12l10 5 10-5',cut:'M6 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6M6 21a3 3 0 1 0 0-6 3 3 0 0 0 0 6M20 4L8.1 15.9M14.5 14.5L20 20M8.1 8.1L12 12',rot:'M21 12a9 9 0 1 1-3-6.7L21 8M21 3v5h-5',type:'M4 7V4h16v3M9 20h6M12 4v16',scan:'M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M7 12h10',find:'M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16M21 21l-4.3-4.3',film:'M2 2h20v20H2zM7 2v20M17 2v20M2 12h20M2 7h5M2 17h5M17 17h5M17 7h5',wand:'M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9zM19 16l.7 1.8 1.8.7-1.8.7L19 21l-.7-1.8-1.8-.7 1.8-.7z',play:'M5 3l14 9-14 9z',frame:'M3 3h18v18H3zM8 8h8v8H8z',hash:'M4 9h16M4 15h16M10 3L8 21M16 3l-2 18',min:'M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7',max:'M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7',rep:'M17 1l4 4-4 4M3 11V9a4 4 0 0 1 4-4h14M7 23l-4-4 4-4M21 13v2a4 4 0 0 1-4 4H3',clock:'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20M12 6v6l4 2',moon:'M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z',sun:'M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10M12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4'};
+const IC={shorten:'link',photoprint:'print',compress:'min',resize:'max',convert:'rep',rotate:'rot',img2pdf:'file',pdfmerge:'layers',pdfsplit:'cut',pdfrotate:'rot',bgremove:'wand',pdf2jpg:'image',pdf2text:'type',scanner:'scan',ocr:'find',gifmaker:'play',gifbg:'wand',vid2gif:'film',frame:'frame',wordcount:'hash',case:'type'};
 function ico(k){const n=typeof k==='string'?k:(k.soon?'clock':IC[k.id]||'file');return`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${(P[n]||P.file).split('M').filter(Boolean).map(d=>`<path d="M${d}"/>`).join('')}</svg>`}
 
 const ls={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
@@ -393,6 +397,7 @@ const TOOLS=[
   if(!cnt)throw new Error('No '+o.cc.toUpperCase()+' found in '+fs[n].name+'. Try raising Tolerance or check the color.');
   x.putImageData(id,0,0);out.push({name:base(fs[n].name)+'-frame.png',blob:await toBlob(c,'image/png'),note:Math.round(cnt/(W*H)*100)+'% of the image made transparent'})}return out}},
 {id:'photoprint',n:'Photo Print Sheet',e:'🖨️',c:'Image',d:'ID photos on a sheet: pick the photo size, paper and copies, then save a print-ready PDF.',a:IMG,wide:1,custom:photoUI},
+{id:'shorten',n:'Link Shortener',e:'🔗',c:'Text',d:'Turn a long link into a short one you can share.',custom:shortUI},
 {id:'wordcount',n:'Word Counter',e:'🔢',c:'Text',d:'Count words, characters, sentences.',text:1},
 {id:'case',n:'Case Converter',e:'🔤',c:'Text',d:'UPPER, lower, Title, Sentence.',text:2}
 ];
@@ -603,6 +608,34 @@ ${rowN('m','Margin','Page margin')}${rowN('g','Spacing','Space between photos')}
   btn.textContent=old;draw()};
  let lw=0;new ResizeObserver(()=>{const w=g('wrap').clientWidth;if(w!==lw){lw=w;draw()}}).observe(g('wrap'));
  fill();draw()}
+
+function shortUI(B){
+ B.innerHTML=`<label class="opt"><span>Long link</span><input type="text" id="sh-u" inputmode="url" autocomplete="off" placeholder="https://example.com/a/very/long/link" aria-label="Link to shorten"></label>
+<label class="opt"><span>Custom name</span><input type="text" id="sh-a" autocomplete="off" maxlength="30" placeholder="optional, e.g. my_photos" aria-label="Custom name for the short link"></label>
+<div class="row"><button class="btn p" id="sh-go">Shorten link</button><button class="btn" id="sh-me" hidden>Use this website's link</button></div>
+<div class="err" id="sh-err" role="alert"></div><div class="res" id="sh-res"></div>
+<div class="pp-st">The link you type is sent to is.gd, a free shortening service, to make the short link, so this tool needs internet. Anyone who has a short link can open it.</div>
+<div class="row" style="align-items:center"><b>Recent short links</b><button class="btn" id="sh-clr" hidden>Clear</button></div><div class="res" id="sh-his"></div>`;
+ const g=id=>B.querySelector('#sh-'+id),HK='shortHist';let hist=ls.get(HK,[]);
+ const row=(long,short)=>{const d=document.createElement('div');d.className='r';d.innerHTML='<span></span><div class="row"></div>';const sp=d.firstChild,a=document.createElement('a');a.href=short;a.target='_blank';a.rel='noopener';a.textContent=short;sp.append(a);
+  if(long){const sm=document.createElement('small');sm.style.cssText='display:block;color:var(--mute)';sm.textContent=long;sp.append(sm)}
+  const cb=document.createElement('button');cb.className='btn';cb.textContent='Copy';cb.onclick=async()=>{try{await navigator.clipboard.writeText(short);cb.textContent='Copied!'}catch(e){cb.textContent='Copy failed'}setTimeout(()=>{cb.textContent='Copy'},1800)};d.lastChild.append(cb);return d};
+ const showHist=()=>{g('his').replaceChildren(...hist.map(h=>row(h[0],h[1])));g('clr').hidden=!hist.length};
+ async function go(){const e=g('err');e.textContent='';g('res').replaceChildren();let u=g('u').value.trim();
+  if(!u){e.textContent='Paste a link first.';return}
+  if(!/^[a-z][a-z0-9+.-]*:/i.test(u))u='https://'+u;
+  let url;try{url=new URL(u)}catch(x){e.textContent='That does not look like a valid link.';return}
+  if(!/^https?:$/.test(url.protocol)){e.textContent='Only http and https links can be shortened.';return}
+  const al=g('a').value.trim();if(al&&!/^[A-Za-z0-9_]+$/.test(al)){e.textContent='The custom name can only use letters, numbers and underscores.';return}
+  const q='url='+encodeURIComponent(url.href)+(al?'&shorturl='+encodeURIComponent(al):''),b=g('go'),old=b.textContent;b.disabled=true;b.textContent='Shortening…';
+  try{const r=await fetch('https://is.gd/create.php?format=json&'+q),d=await r.json();
+   if(d.shorturl){g('res').append(row(url.href,d.shorturl));hist=[[url.href,d.shorturl],...hist.filter(h=>h[1]!==d.shorturl)].slice(0,10);ls.set(HK,hist);showHist()}
+   else e.textContent=d.errormessage||'The service could not shorten this link.'}
+  catch(x){e.textContent='Could not reach the shortening service. Check your internet, or ';const a2=document.createElement('a');a2.href='https://is.gd/create.php?format=simple&'+q;a2.target='_blank';a2.rel='noopener';a2.textContent='open is.gd to finish';e.append(a2,'.')}
+  b.disabled=false;b.textContent=old}
+ g('go').onclick=go;g('u').onkeydown=e=>{if(e.key==='Enter')go()};g('clr').onclick=()=>{hist=[];ls.set(HK,hist);showHist()};
+ if(/^https?:$/.test(location.protocol)){g('me').hidden=false;g('me').onclick=()=>{g('u').value=location.origin+location.pathname;go()}}
+ showHist();window.runCur=go}
 function textUI(t,B){window.runCur=null;
  B.innerHTML=`<textarea id="tx" placeholder="Type or paste text…"></textarea>`+(t.text===1?`<div class="cnt"><div><b id="c1">0</b><span>Words</span></div><div><b id="c2">0</b><span>Characters</span></div><div><b id="c3">0</b><span>Sentences</span></div><div><b id="c4">0</b><span>Min to read</span></div></div>`:`<div class="row"><button class="btn" data-c="u">UPPER</button><button class="btn" data-c="l">lower</button><button class="btn" data-c="t">Title Case</button><button class="btn" data-c="s">Sentence case</button><button class="btn" id="cp">Copy</button></div>`);
  const tx=$('#tx');
