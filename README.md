@@ -35,7 +35,7 @@ Open the app once while online. After that:
 | PDF to JPG/PNG, PDF to Text, previews | |
 | Word Counter, Case Converter | |
 
-Offline support saves the page and its libraries in the browser's cache. If you clear your browser data, open the app online once more. Background Remover and OCR offline use has not been tested, so try them in airplane mode before relying on them.
+Offline support saves the page and its libraries in the browser's cache. The Link Shortener always needs internet. The QR tools load three small libraries (QR maker, QR reader, ZIP) the first time you open the site online, then work offline. If you clear your browser data, open the app online once more. Background Remover and OCR offline use has not been tested, so try them in airplane mode before relying on them.
 
 ## Tools
 
@@ -45,7 +45,7 @@ Offline support saves the page and its libraries in the browser's cache. If you 
 |----------|-------|
 | Image | Image Compressor, Image Resizer, Image Converter (PNG/JPG/WEBP), Image Rotator and Flipper, Image to PDF, Background Remover, GIF Maker, GIF Remove Background, Video to GIF, Photo Frame Maker, Photo Print Sheet |
 | PDF | PDF Merger, PDF Splitter / Page Extractor, PDF Page Rotator, PDF to JPG/PNG, PDF to Text, PDF Scanner |
-| Text | Word Counter, Case Converter, OCR (image or scanned PDF to text) |
+| Text | Word Counter, Case Converter, OCR (image or scanned PDF to text), Link Shortener, QR Code Generator, QR Code and Barcode Reader |
 
 ### Planned (shown as "soon" on the site)
 
@@ -74,6 +74,29 @@ Offline support saves the page and its libraries in the browser's cache. If you 
 - Design: Retro-Futurism style (neon cyan, hot pink, and purple on deep indigo), chosen with the ui-ux-pro-max design skill. Fonts are Orbitron (headings) and Exo 2 (body), loaded from Google Fonts. Icons are inline SVG, so no icon library is needed.
 
 ## Changelog
+
+### v2.3 — QR Code Generator and QR Code and Barcode Reader
+- Added **QR Code Generator** (in the Text tools) with a live preview.
+  - **Content types:** URL, Email, Phone, SMS, Zalo / WhatsApp chat, Geo location, Freeform text, Calendar event, Bitcoin, VietQR bank transfer, Wi-Fi access, Digital contact (vCard, with first and last name, company, job title, two phones, email, website, address, and note), and a **Bulk generator** (one item per line, up to 100).
+  - **Style:** 9 color themes plus a Remix button, 12 module shapes, 8 finder frames, 10 finder centers, module, canvas, frame and center colors, and Save my style / Reset.
+  - **Center logo:** upload your own image, set its size, and choose whether it gets a background plate. (Brand logos are not included.)
+  - **Text:** a top heading and a bottom caption, with a choice of font.
+  - **Layout:** module size, card corner radius, padding, size (240 to 1200 px), and damage recovery (L, M, Q, H). Damage recovery switches to H automatically when there is a logo.
+  - **Scan readiness:** the tool really tries to scan the code it just drew and tells you if it can be read. It also warns about low contrast, light-on-dark codes, and small modules.
+  - **Export:** PNG (1x, 2x, 4x), SVG, and PDF. Bulk mode downloads a ZIP of PNGs or SVGs, or a PDF sheet with 12 codes per page.
+- Added **QR Code and Barcode Reader** (in the Text tools). Read a code from a photo, a screenshot, a pasted image, or your camera. It understands links, Wi-Fi (with a Copy password button), contacts, events, locations, SMS, email, phone, Bitcoin, and VietQR bank transfers (bank, account, amount, message). Links are never opened for you.
+- Barcodes (EAN-13, EAN-8, UPC-A, UPC-E, Code 128) are read in browsers that support it (Chrome, Edge, Safari). Other browsers read QR codes only and say so.
+- The VietQR bank list has 18 common banks. Check the bank code with your bank before printing.
+- Everything runs on your device. Added a QR code chip to the top card. Bumped the offline cache to v2.3. No other tools were changed.
+
+### v2.2 — Link Shortener
+- Added **Link Shortener** (in the Text tools). Paste a long link and get a short one, with a Copy button.
+- Optional **custom name** for the short link (letters, numbers, and underscores). If the name is taken, the tool shows the service's message.
+- **Use this website's link** button (when the site is online) to shorten your own GitHub Pages address.
+- Keeps your last 10 short links in this browser, with Copy buttons and a Clear button.
+- Checks the link first: it adds `https://` if missing and only allows http and https links.
+- It uses the free **is.gd** service (no account or key). The link you type is sent to is.gd, so this is the one tool that needs internet and sends something off your device. Your files are never involved. If the service can't be reached, the tool shows a link to finish on is.gd directly.
+- Bumped the offline cache to v2.2. No other tools were changed.
 
 ### v2.1 — Photo Print Sheet (1x1 / ID photos to PDF)
 - Added **Photo Print Sheet**, a step-by-step tool for printing photos on a sheet of paper.
